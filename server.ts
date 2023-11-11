@@ -1,10 +1,21 @@
+import * as dotenv from "dotenv"
+dotenv.config()
 import express, { json } from "express";
-import postsRouter from "./routers/postRoutes";
+import {postsRouter, protectedRouter} from "./routers/postRoutes";
+import { createUser, signIn } from "./controllers/userController";
+import { protect } from "./middleware/authMiddleware";
+
 
 const app = express()
 app.use(json())
 
-app.use("/posts", postsRouter)
+app.use("/", postsRouter)
+
+app.use("/", protectedRouter)
+
+// user routes
+app.post("/user", createUser)
+app.post("/signin", signIn)
 
 app.listen(8080, () => {
   console.log("Server listening on port 8080")
