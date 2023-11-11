@@ -3,7 +3,7 @@ import bcrypt from "bcrypt"
 import { NextFunction, Request, Response } from "express"
 
 interface CustomRequest extends Request {
-  user: any; // You can replace 'any' with a more specific type if needed
+  user: any;
 }
 
 export const comparePassword = (password: string, hashedPassword: string) => {

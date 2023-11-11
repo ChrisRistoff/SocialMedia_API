@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import * as db from "../db/index"
+import { Request, Response } from "express";
 import { comparePassword, createJWT, hashPassword } from "../middleware/authMiddleware";
+import { createUserModel, singInModel } from "../models/userModels";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -8,16 +8,13 @@ export const createUser = async (req: Request, res: Response) => {
     const email = req.body.email
     const password = await hashPassword(req.body.password)
 
-    const existingUser = await db.query(
-      `SELECT * FROM users WHERE username = $1 OR email = $2`,
-      [username, email]
-    )
+    const user = await createUserModel(username, email, password)
 
-    if (existingUser.rows.length) return res.status(409).send({error: "Username or email taken"})
+    if(!user) return res.status(409).send({error: "User already exists"})
 
-    const user = await db.query(`INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING user_id, username`, [username, email, password])
+    if(user === "err") throw new Error()
 
-    const token = createJWT(user.rows[0])
+    const token = createJWT(user)
 
     res.status(200).send({ token })
   } catch (err) {
@@ -30,21 +27,21 @@ export const signIn = async (req: Request, res: Response) => {
   const { email, password } = req.body
 
   try {
-    const user = await db.query(`SELECT * FROM users WHERE email=$1`, [email])
+    const user = await singInModel(email)
 
-    if(!user) {
-      return res.status(404).send({ error: "No such user"})
-    }
+    if(!user) return res.status(404).send({ error: "No such user"})
+    if(user === "err") throw new Error()
 
-    const isValid = await comparePassword(password, user.rows[0].password)
+    const isValid = await comparePassword(password, user.password)
 
     if (!isValid) {
       return res.status(404).send({ error: "Incorrect password" })
     }
 
-    const token = createJWT(user.rows[0])
+    const token = createJWT(user)
 
     res.status(200).send({ token })
+
   } catch (err) {
     res.status(400).send({ error: "Invalid input" })
   }

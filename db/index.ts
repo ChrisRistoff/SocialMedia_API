@@ -1,5 +1,4 @@
 import { Pool } from "pg";
-import { types } from "pg";
 
 const pool = new Pool({
   user: 'krasyo',

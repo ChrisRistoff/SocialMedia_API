@@ -3,7 +3,6 @@ dotenv.config()
 import express, { json } from "express";
 import {postsRouter, protectedRouter} from "./routers/postRoutes";
 import { createUser, signIn } from "./controllers/userController";
-import { protect } from "./middleware/authMiddleware";
 
 
 const app = express()
