@@ -6,7 +6,9 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const username = req.body.username
     const email = req.body.email
+    if(!username || !email || !req.body.password) return res.status(400).send({error: "Missing parameters"})
     const password = await hashPassword(req.body.password)
+
 
     const user = await createUserModel(username, email, password)
 
@@ -18,7 +20,6 @@ export const createUser = async (req: Request, res: Response) => {
 
     res.status(200).send({ token })
   } catch (err) {
-    console.log(err)
     res.status(500).send({error: "Server error"})
   }
 }
@@ -35,7 +36,7 @@ export const signIn = async (req: Request, res: Response) => {
     const isValid = await comparePassword(password, user.password)
 
     if (!isValid) {
-      return res.status(404).send({ error: "Incorrect password" })
+      return res.status(401).send({ error: "Incorrect password" })
     }
 
     const token = createJWT(user)
