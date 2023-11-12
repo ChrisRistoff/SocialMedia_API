@@ -22,6 +22,7 @@ INSERT INTO categories (category_name, description) VALUES
 
 CREATE TABLE IF NOT EXISTS threads(
     thread_id SERIAL PRIMARY KEY,
+    title TEXT,
     content TEXT,
     created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     category_id INTEGER REFERENCES categories(category_id),

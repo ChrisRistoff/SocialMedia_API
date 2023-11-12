@@ -1,4 +1,4 @@
-import app from "./index"
+import app from "./app"
 
 app.listen(8080, () => {
   console.log("Server listening on port 8080")

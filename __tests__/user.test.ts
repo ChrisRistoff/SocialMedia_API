@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import app from "../index"
+import app from "../app"
 import * as db from "../db/index"
 import { Server } from "http";
 
