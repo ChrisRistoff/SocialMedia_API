@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS posts(
     post_content TEXT,
     created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id INTEGER REFERENCES users(user_id),
-    thread_id INTEGER REFERENCES threads(thread_id)
+    thread_id INTEGER REFERENCES threads(thread_id),
+    reply_to_post_id INTEGER REFERENCES posts(post_id)
 );
 
 CREATE TABLE IF NOT EXISTS reactions(

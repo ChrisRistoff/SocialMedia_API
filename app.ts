@@ -17,7 +17,7 @@ app.use("/", protectedPostsRouter)
 
 
 // user routes
-app.post("/user", createUser)
+app.post("/signup", createUser)
 app.post("/signin", signIn)
 
 
