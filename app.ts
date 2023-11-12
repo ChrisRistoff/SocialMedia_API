@@ -1,9 +1,9 @@
 import * as dotenv from "dotenv"
 dotenv.config()
 import express, { json } from "express";
-import {postsRouter, protectedRouter} from "./routers/postRoutes";
-import { threadsRouterProtected, threadsRouter } from "./routers/threadRouters";
+import { threadsRouterProtected } from "./routers/threadRouters";
 import { createUser, signIn } from "./controllers/userController";
+import { protectedPostsRouter } from "./routers/postRoutes";
 
 
 const app = express()
@@ -13,7 +13,7 @@ app.use(json())
 app.use("/", threadsRouterProtected)
 
 // posts
-app.use("/", postsRouter)
+app.use("/", protectedPostsRouter)
 
 
 // user routes

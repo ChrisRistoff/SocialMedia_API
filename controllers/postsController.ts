@@ -1,11 +1,18 @@
 import { Request, Response } from "express"
-import { getPostsModel } from "../models/postsModels"
+import { createPostsModel } from "../models/postsModels"
 
-export const getPosts = async (_: Request, res: Response) => {
+export const createPost = async (req: Request, res: Response) => {
+  const {thread_id, user_id, post_content} = req.body
+
+  if(!post_content) return res.status(400).send({error: "Missing parameters"})
+
   try {
-    const result = await getPostsModel()
-    res.status(200).send(result?.rows)
+    const post = await createPostsModel(thread_id, user_id, post_content)
+
+    if(!post) throw new Error ()
+
+    res.status(201).send({ post })
   } catch (error) {
-    console.log(error)
+    res.status(500).send({ error: "Internal server error" })
   }
 }

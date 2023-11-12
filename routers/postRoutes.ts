@@ -1,10 +1,8 @@
 import { Router } from "express";
-import { getPosts } from "../controllers/postsController";
 import { protect } from "../middleware/authMiddleware";
+import { createPost } from "../controllers/postsController";
 export const postsRouter = Router()
-export const protectedRouter = Router()
+export const protectedPostsRouter = Router()
 
-postsRouter.get("/get", getPosts)
-
-protectedRouter.get("/getp", protect, getPosts)
+protectedPostsRouter.post("/posts", protect, createPost)
 

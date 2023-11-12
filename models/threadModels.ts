@@ -4,13 +4,13 @@ interface FlexibleObject {
   [key: string]: any;
 }
 
-export const createThreadModel = async (user_id: number, category_id: number, title: string, content: string) => {
+export const createThreadModel = async (user_id: number, category_id: number, title: string, post_content: string) => {
 
   try {
     const result: FlexibleObject = await db.query(`
     INSERT INTO threads (user_id, category_id, title, content)
     VALUES ($1, $2, $3, $4) RETURNING *;
-    `, [user_id, category_id, title, content])
+    `, [user_id, category_id, title, post_content])
 
 
     const user = await db.query(`SELECT * FROM users WHERE user_id = $1`, [user_id])
