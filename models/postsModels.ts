@@ -45,3 +45,39 @@ export const replyToPostModel = async (post_content: string, user_id: number, th
     return false
   }
 }
+
+export const getAllPostsModel = async (thread_id) => {
+  try {
+
+    const thread = await db.query(`SELECT title FROM threads WHERE thread_id=$1`, [thread_id])
+
+    if (thread.rows.length < 1) return false
+
+    const posts = await db.query(`
+      SELECT
+        p.post_id,
+        p.post_content,
+        p.created_at AS post_created_at,
+        p.reply_to_post_id,
+        u.user_id,
+        u.username,
+        u.email,
+        rp.post_content AS reply_to_content,
+        rp.created_at AS reply_to_created_at
+      FROM
+        posts p
+      JOIN
+        users u ON p.user_id = u.user_id
+      LEFT JOIN
+        posts rp ON p.reply_to_post_id = rp.post_id
+      WHERE
+        p.thread_id = $1
+      ORDER BY
+        p.created_at;
+    `, [thread_id])
+
+    return posts.rows
+  } catch (error) {
+    return false
+  }
+}

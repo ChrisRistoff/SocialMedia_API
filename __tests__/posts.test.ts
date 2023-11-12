@@ -98,7 +98,18 @@ describe('create post', () => {
     expect(res2.body.error).toBe("Internal server error")
   })
 
+
   describe('replies', () => {
+   beforeAll(async () => {
+      await db.query("BEGIN", [])
+    })
+
+
+    afterAll(async() => {
+      await db.query("ROLLBACK", [])
+    });
+
+
     it('should return an error when the user is not signed in', async () => {
       const res = await supertest(app)
         .post("/posts")
@@ -185,6 +196,36 @@ describe('create post', () => {
 
       expect(res3.statusCode).toBe(500)
       expect(res3.body.error).toBe("Internal server error")
+    })
+  })
+
+  describe('get all posts', () => {
+    it('should return an error if thread ID is not existent', async () => {
+      const res = await supertest(app)
+        .get("/posts")
+        .send({thread_id: 5000})
+
+      expect(res.statusCode).toBe(500)
+      expect(res.body.error).toBe("Internal server error")
+    })
+
+    it('should return an error when ID is not provided', async () => {
+       const res = await supertest(app)
+        .get("/posts")
+        .send({})
+
+      expect(res.statusCode).toBe(400)
+      expect(res.body.error).toBe("Missing parameters")
+    })
+
+    it('should return all post in an array of objects', async () => {
+      const res = await supertest(app)
+        .get("/posts")
+        .send({thread_id: 1})
+
+      expect(res.statusCode).toBe(200)
+      expect(typeof res.body.posts[0]).toBe("object")
+      expect(Array.isArray(res.body.posts)).toBe(true)
     })
   })
 
