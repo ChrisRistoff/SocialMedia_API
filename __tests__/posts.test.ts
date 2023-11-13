@@ -10,6 +10,14 @@ describe('create post', () => {
     server = app.listen(8080)
     await db.query("BEGIN", [])
 
+    const register = await supertest(app)
+      .post("/signup")
+      .send({
+        username: "test",
+        email: "test@test.test",
+        password: "test"
+      })
+
     const auth = await supertest(app)
       .post("/signin")
       .send({
