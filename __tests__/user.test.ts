@@ -4,30 +4,23 @@ import * as db from "../db/index"
 import { Server } from "http";
 
 
+let server: Server
+beforeAll(async () => {
+  server = app.listen(0)
+  await db.query("BEGIN", [])
+})
+
+afterAll(async() => {
+  await db.query("ROLLBACK", [])
+  server.close()
+  db.pool.end()
+});
+
 describe('Create User', () => {
-  let server: Server
-  beforeAll(async () => {
-    server = app.listen(8080)
-    await db.query("BEGIN", [])
-  })
-
-  afterAll(async() => {
-    await db.query("ROLLBACK", [])
-    server.close()
-  });
-
-/*
-  beforeEach(async () => {
-  })
-
-  afterEach(async () => {
-
-  })
-*/
 
   it('should create a new user', async () => {
     const response = await supertest(app)
-      .post("/user")
+      .post("/signup")
       .send({
         username: "testUser",
         email: "test@test.com",
@@ -40,7 +33,7 @@ describe('Create User', () => {
 
   it('should return an error if user already exists', async () => {
      const response2 = await supertest(app)
-      .post("/user")
+      .post("/signup")
       .send({
         username: "testUser",
         email: "test@test.com",
@@ -53,7 +46,7 @@ describe('Create User', () => {
 
   it('should return an error when missing parameters', async () => {
     const response = await supertest(app)
-      .post("/user")
+      .post("/signup")
       .send({
         password: "password1"
       })
@@ -63,7 +56,7 @@ describe('Create User', () => {
     expect(response.body.token).not.toBeDefined()
 
     const response2 = await supertest(app)
-      .post("/user")
+      .post("/signup")
       .send({
         username: "testUser"
       })
@@ -73,7 +66,7 @@ describe('Create User', () => {
     expect(response2.body.token).not.toBeDefined()
 
     const response3 = await supertest(app)
-      .post("/user")
+      .post("/signup")
       .send({
         email: "test@test.com"
       })
@@ -85,21 +78,9 @@ describe('Create User', () => {
 })
 
 describe('sign in', () => {
-  let server: Server
-  beforeAll(async () => {
-    server = app.listen(8080)
-    await db.query("BEGIN", [])
-  })
-
-  afterAll(async() => {
-    await db.query("ROLLBACK", [])
-    server.close()
-    await db.pool.end()
-  });
-
   it('should sign in user if it exists', async () => {
     await supertest(app)
-      .post("/user")
+      .post("/signup")
       .send({
         username: "testUser",
         email: "test@test.com",

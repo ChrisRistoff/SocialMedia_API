@@ -3,37 +3,37 @@ import app from "../app";
 import * as db from "../db/index"
 import { Server } from "http";
 
+let server: Server
+let token: string
+beforeAll(async () => {
+  server = app.listen(0)
+  await db.query("BEGIN", [])
+
+  const register = await supertest(app)
+    .post("/signup")
+    .send({
+      username: "test",
+      email: "test@test.test",
+      password: "test"
+    })
+
+  const auth = await supertest(app)
+    .post("/signin")
+    .send({
+      email: "test@test.test",
+      password: "test"
+    })
+
+  token = auth.body.token
+})
+
+afterAll(async() => {
+  await db.query("ROLLBACK", [])
+  server.close()
+  db.pool.end()
+});
+
 describe('create post', () => {
-  let server: Server
-  let token: string
-  beforeAll(async () => {
-    server = app.listen(8080)
-    await db.query("BEGIN", [])
-
-    const register = await supertest(app)
-      .post("/signup")
-      .send({
-        username: "test",
-        email: "test@test.test",
-        password: "test"
-      })
-
-    const auth = await supertest(app)
-      .post("/signin")
-      .send({
-        email: "test@test.test",
-        password: "test"
-      })
-
-    token = auth.body.token
-  })
-
-  afterAll(async() => {
-    await db.query("ROLLBACK", [])
-    server.close()
-    db.pool.end()
-  });
-
   describe('create post', () => {
     it('should not create a new post if user is not authorised', async () => {
       const res = await supertest(app)
@@ -108,15 +108,6 @@ describe('create post', () => {
 
 
   describe('replies', () => {
-   beforeAll(async () => {
-      await db.query("BEGIN", [])
-    })
-
-
-    afterAll(async() => {
-      await db.query("ROLLBACK", [])
-    });
-
 
     it('should return an error when the user is not signed in', async () => {
       const res = await supertest(app)

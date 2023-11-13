@@ -3,29 +3,37 @@ import app from "../app";
 import * as db from "../db/index"
 import { Server } from "http";
 
+let server: Server
+let token: string
+beforeAll(async () => {
+  server = app.listen(0)
+  await db.query("BEGIN", [])
+
+  const register = await supertest(app)
+    .post("/signup")
+    .send({
+      username: "test",
+      email: "test@test.test",
+      password: "test"
+    })
+
+  const auth = await supertest(app)
+    .post("/signin")
+    .send({
+      email: "test@test.test",
+      password: "test"
+    })
+
+  token = auth.body.token
+})
+
+afterAll(async() => {
+  await db.query("ROLLBACK", [])
+  server.close()
+  db.pool.end()
+});
+
 describe('threads', () => {
-  let server: Server
-  let token: string
-  beforeAll(async () => {
-    server = app.listen(8080)
-    await db.query("BEGIN", [])
-
-    const auth = await supertest(app)
-      .post("/signin")
-      .send({
-        email: "krsnhrstv@gmail.com",
-        password: "krasen"
-      })
-
-    token = auth.body.token
-  })
-
-  afterAll(async() => {
-    await db.query("ROLLBACK", [])
-    server.close()
-    db.pool.end()
-  });
-
   describe('createThread', () => {
     it('should not create a new thread if user is not signed in', async () => {
       const res = await supertest(app)
@@ -54,7 +62,7 @@ describe('threads', () => {
 
       expect(res.statusCode).toBe(201)
       expect(typeof res.body).toBe("object")
-      expect(res.body.thread.user.username).toBe("krasen")
+      expect(res.body.thread.user.username).toBe("test")
       expect(res.body.thread.title).toBe("test title")
       expect(res.body.thread.content).toBe("test content")
     })
