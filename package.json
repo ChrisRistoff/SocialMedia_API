@@ -6,7 +6,9 @@
   "scripts": {
     "compile": "tsc && node ./dist/server.js",
     "start": "nodemon -e ts --exec \"npm run compile\"",
-    "test": "jest -runInBand"
+    "test": "jest",
+    "seed": "node ./dist/db/seed.js",
+    "db": "psql -f ./db/forum_schema.sql"
   },
   "repository": {
     "type": "git",

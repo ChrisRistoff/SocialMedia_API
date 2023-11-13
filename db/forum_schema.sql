@@ -16,10 +16,6 @@ CREATE TABLE IF NOT EXISTS categories(
     description TEXT
 );
 
-INSERT INTO categories (category_name, description) VALUES
-    ( 'JavaScript BE', 'Everything JS backend' ),
-    ( 'DATABASES', 'Everything DATABASES' );
-
 CREATE TABLE IF NOT EXISTS threads(
     thread_id SERIAL PRIMARY KEY,
     title TEXT,

@@ -9,7 +9,7 @@ beforeAll(async () => {
   server = app.listen(0)
   await db.query("BEGIN", [])
 
-  const register = await supertest(app)
+  await supertest(app)
     .post("/signup")
     .send({
       username: "test",

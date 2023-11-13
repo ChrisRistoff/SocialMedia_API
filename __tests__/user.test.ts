@@ -17,7 +17,6 @@ afterAll(async() => {
 });
 
 describe('Create User', () => {
-
   it('should create a new user', async () => {
     const response = await supertest(app)
       .post("/signup")
@@ -123,4 +122,5 @@ describe('sign in', () => {
     expect(response.body.error).toBe("No such user")
     expect(response.body.token).not.toBeDefined()
   })
+
 })
