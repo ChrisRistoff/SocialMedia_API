@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createThread } from "../controllers/threadControllers";
+import { createThread, getAllThreads } from "../controllers/threadControllers";
 import { protect } from "../middleware/authMiddleware";
 import { body } from "express-validator";
 
@@ -11,3 +11,5 @@ threadsRouterProtected.post("/threads",
   body("description").isString().isLength({min: 100}),
   protect,
   createThread)
+
+threadsRouter.get("/threads", getAllThreads)

@@ -94,3 +94,23 @@ describe('createThread', () => {
     expect(res2.body.error).toBe("Internal server error")
   })
 })
+
+describe('get all threads by category_id', () => {
+  it('should return threads when given an id', async () => {
+    const res = await supertest(app)
+      .get("/threads")
+      .send({
+        category_id: 1
+      })
+
+    const thread = res.body.threads[0]
+
+    expect(res.statusCode).toBe(200)
+    expect(thread.creator_username).toBe("test")
+    expect(thread.title).toBe("test thread title")
+    expect(thread.content).toBe("test thread content")
+    expect(thread.post_count).toBe("2")
+    expect(thread.thread_id).toBe(1)
+    expect(thread.category_id).toBe(1)
+  })
+})

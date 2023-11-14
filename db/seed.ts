@@ -1,5 +1,5 @@
 import * as db from "./index"
-import { thread } from "./seed_data/thread"
+import { thread, thread2 } from "./seed_data/thread"
 import { user } from "./seed_data/user"
 import { post } from "./seed_data/post"
 import { reply } from "./seed_data/reply"
@@ -13,7 +13,9 @@ export const seed = async (thread: any, user: any, post: any, reply: any) => {
     const usr = await createUser(user)
     console.log(usr.rows)
     const thrd = await createThread(thread)
+    const thrd2 = await createThread(thread2)
     console.log(thrd.rows)
+    console.log(thrd2.rows)
     const pst = await createPost(post)
     console.log(pst.rows)
     const rpl = await createReply(reply)
