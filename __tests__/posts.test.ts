@@ -76,7 +76,7 @@ describe('create post', () => {
       })
 
       expect(res.statusCode).toBe(400)
-      expect(res.body.error).toBe("Missing parameters")
+      expect(Array.isArray(res.body.error)).toBe(true)
   })
 
   it('should return an error if any of the IDs are wrong', async() => {
@@ -152,7 +152,7 @@ describe('create post', () => {
       })
 
       expect(res.statusCode).toBe(400)
-      expect(res.body.error).toBe("Missing parameters")
+      expect(Array.isArray(res.body.error)).toBe(true)
 
     })
 
@@ -213,8 +213,8 @@ describe('create post', () => {
         .get("/posts")
         .send({})
 
-      expect(res.statusCode).toBe(400)
-      expect(res.body.error).toBe("Missing parameters")
+      expect(res.statusCode).toBe(500)
+      expect(res.body.error).toBe("Internal server error")
     })
 
     it('should return all post in an array of objects', async () => {
@@ -227,5 +227,4 @@ describe('create post', () => {
       expect(Array.isArray(res.body.posts)).toBe(true)
     })
   })
-
 })

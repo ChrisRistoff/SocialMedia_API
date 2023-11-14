@@ -4,8 +4,6 @@ import { createPostsModel, getAllPostsModel, replyToPostModel } from "../models/
 export const createPost = async (req: Request, res: Response) => {
   const {thread_id, user_id, post_content} = req.body
 
-  if(!post_content) return res.status(400).send({error: "Missing parameters"})
-
   try {
     const post = await createPostsModel(thread_id, user_id, post_content)
 
@@ -19,7 +17,6 @@ export const createPost = async (req: Request, res: Response) => {
 
 export const replyToPost = async (req: Request, res: Response) => {
   const { post_content, user_id, thread_id, reply_to_post_id } = req.body
-  if(!post_content) return res.status(400).send({ error: "Missing parameters" })
 
   try {
     const reply = await replyToPostModel(post_content, user_id, thread_id, reply_to_post_id)
@@ -35,7 +32,6 @@ export const replyToPost = async (req: Request, res: Response) => {
 
 export const getAllPosts = async (req: Request, res: Response) => {
   const { thread_id } = req.body
-  if(!thread_id) return res.status(400).send({ error: "Missing parameters" })
 
   try {
     const posts = await getAllPostsModel(thread_id)

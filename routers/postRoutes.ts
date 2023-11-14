@@ -9,14 +9,17 @@ export const protectedPostsRouter = Router()
 
 protectedPostsRouter.post("/posts",
   protect,
-  body("post_content").isString().notEmpty().isLength({min: 100}),
+  body('post_content').notEmpty(),
   handleInputError,
   createPost)
 
 protectedPostsRouter.post("/replies",
   protect,
-  body("post_content").isString().notEmpty().isLength({min: 100}),
+  body('post_content').notEmpty(),
   handleInputError,
   replyToPost)
 
-postsRouter.get("/posts", getAllPosts)
+postsRouter.get("/posts",
+  body("thread_id").notEmpty(),
+  getAllPosts
+)

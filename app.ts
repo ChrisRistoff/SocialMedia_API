@@ -4,6 +4,7 @@ import express, { json } from "express";
 import { threadsRouterProtected } from "./routers/threadRouters";
 import { createUser, signIn } from "./controllers/userController";
 import { postsRouter, protectedPostsRouter } from "./routers/postRoutes";
+import { userRouter } from "./routers/userRouters";
 
 
 const app = express()
@@ -18,8 +19,6 @@ app.use("/", postsRouter)
 
 
 // user routes
-app.post("/signup", createUser)
-app.post("/signin", signIn)
-
+app.use("/", userRouter)
 
 export default app
