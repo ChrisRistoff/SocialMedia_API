@@ -5,9 +5,9 @@ import { body } from "express-validator";
 export const userRouter = Router()
 
 userRouter.post("/signup",
-  body("username").notEmpty().isLength({min: 4}),
+  body("username").notEmpty().isLength({ min: 4 }),
   body("email").isEmail(),
-  body("password").notEmpty().isLength({min: 8}),
+  body("password").notEmpty().isLength({ min: 8 }),
   createUser
 )
 

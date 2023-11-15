@@ -10,7 +10,7 @@ beforeAll(async () => {
   await db.query("BEGIN", [])
 })
 
-afterAll(async() => {
+afterAll(async () => {
   await db.query("ROLLBACK", [])
   server.close()
   db.pool.end()
@@ -31,7 +31,7 @@ describe('Create User', () => {
   })
 
   it('should return an error if user already exists', async () => {
-     const response2 = await supertest(app)
+    const response2 = await supertest(app)
       .post("/signup")
       .send({
         username: "testUser",
@@ -98,7 +98,7 @@ describe('sign in', () => {
   })
 
   it('wrong password', async () => {
-     const response = await supertest(app)
+    const response = await supertest(app)
       .post("/signin")
       .send({
         email: "test@test.com",
@@ -111,7 +111,7 @@ describe('sign in', () => {
   })
 
   it('wrong email', async () => {
-     const response = await supertest(app)
+    const response = await supertest(app)
       .post("/signin")
       .send({
         email: "testaa@test.com",

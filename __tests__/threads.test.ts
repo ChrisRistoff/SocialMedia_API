@@ -27,7 +27,7 @@ beforeAll(async () => {
   token = auth.body.token
 })
 
-afterAll(async() => {
+afterAll(async () => {
   await db.query("ROLLBACK", [])
   server.close()
   db.pool.end()

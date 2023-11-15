@@ -25,7 +25,7 @@ export const singInModel = async (email: string) => {
   try {
     const user = await db.query(`SELECT * FROM USERS WHERE email=$1`, [email])
 
-    if(!user) return
+    if (!user) return
 
     return user.rows[0]
 

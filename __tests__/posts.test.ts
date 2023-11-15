@@ -34,7 +34,7 @@ beforeAll(async () => {
   token = auth.body.token
 })
 
-afterAll(async() => {
+afterAll(async () => {
   server.close()
   db.pool.end()
 });
@@ -53,8 +53,8 @@ describe('create post', () => {
     expect(res.body.error).toBe("You need to be logged in")
   })
 
-  it('should create a new post when the user is logged in', async() => {
-     const res = await supertest(app)
+  it('should create a new post when the user is logged in', async () => {
+    const res = await supertest(app)
       .post("/posts")
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -70,7 +70,7 @@ describe('create post', () => {
   })
 })
 
-it('should return error if post_content is blank', async() => {
+it('should return error if post_content is blank', async () => {
   const res = await supertest(app)
     .post("/posts")
     .set("Authorization", `Bearer ${token}`)
@@ -80,11 +80,11 @@ it('should return error if post_content is blank', async() => {
       post_content: ""
     })
 
-    expect(res.statusCode).toBe(400)
-    expect(Array.isArray(res.body.error)).toBe(true)
+  expect(res.statusCode).toBe(400)
+  expect(Array.isArray(res.body.error)).toBe(true)
 })
 
-it('should return an error if any of the IDs are wrong', async() => {
+it('should return an error if any of the IDs are wrong', async () => {
   const res = await supertest(app)
     .post("/posts")
     .set("Authorization", `Bearer ${token}`)
@@ -120,7 +120,7 @@ describe('replies', () => {
         thread_id: 1,
         user_id: 1,
         post_content: "test post content"
-    })
+      })
 
     expect(res.statusCode).toBe(401)
     expect(res.body.error).toBe("You need to be logged in")
@@ -135,7 +135,7 @@ describe('replies', () => {
         user_id: 1,
         post_content: "test reply content",
         reply_to_post_id: 1
-    })
+      })
 
     expect(res.statusCode).toBe(201)
     const reply = res.body.reply
@@ -145,7 +145,7 @@ describe('replies', () => {
   })
 
   it('should throw an error when content is empty', async () => {
-     const res = await supertest(app)
+    const res = await supertest(app)
       .post("/replies")
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -153,7 +153,7 @@ describe('replies', () => {
         user_id: 1,
         post_content: "",
         reply_to_post_id: 1
-    })
+      })
 
     expect(res.statusCode).toBe(400)
     expect(Array.isArray(res.body.error)).toBe(true)
@@ -169,7 +169,7 @@ describe('replies', () => {
         user_id: 1,
         post_content: "test reply content",
         reply_to_post_id: 50000
-    })
+      })
 
     expect(res.statusCode).toBe(500)
     expect(res.body.error).toBe("Internal server error")
@@ -182,7 +182,7 @@ describe('replies', () => {
         user_id: 5000,
         post_content: "test reply content",
         reply_to_post_id: 1
-    })
+      })
 
     expect(res2.statusCode).toBe(500)
     expect(res2.body.error).toBe("Internal server error")
@@ -195,7 +195,7 @@ describe('replies', () => {
         user_id: 1,
         post_content: "test reply content",
         reply_to_post_id: 1
-    })
+      })
 
     expect(res3.statusCode).toBe(500)
     expect(res3.body.error).toBe("Internal server error")
@@ -206,14 +206,14 @@ describe('get all posts', () => {
   it('should return an error if thread ID is not existent', async () => {
     const res = await supertest(app)
       .get("/posts")
-      .send({thread_id: 5000})
+      .send({ thread_id: 5000 })
 
     expect(res.statusCode).toBe(500)
     expect(res.body.error).toBe("Internal server error")
   })
 
   it('should return an error when ID is not provided', async () => {
-     const res = await supertest(app)
+    const res = await supertest(app)
       .get("/posts")
       .send({})
 
@@ -224,7 +224,7 @@ describe('get all posts', () => {
   it('should return all post in an array of objects', async () => {
     const res = await supertest(app)
       .get("/posts")
-      .send({thread_id: 1})
+      .send({ thread_id: 1 })
 
     expect(res.statusCode).toBe(200)
     expect(typeof res.body.posts[0]).toBe("object")

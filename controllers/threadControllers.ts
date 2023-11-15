@@ -7,7 +7,7 @@ export const createThread = async (req: Request, res: Response) => {
   try {
     const thread = await createThreadModel(user_id, category_id, title, content)
 
-    if(!thread) throw new Error("Internal server error")
+    if (!thread) throw new Error("Internal server error")
 
     res.status(201).send({ thread })
   } catch (error) {
