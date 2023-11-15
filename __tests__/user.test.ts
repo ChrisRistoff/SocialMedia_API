@@ -1,126 +1,106 @@
 import supertest from "supertest";
-import app from "../app"
-import * as db from "../db/index"
+import app from "../app";
+import * as db from "../db/index";
 import { Server } from "http";
 
-
-let server: Server
+let server: Server;
 beforeAll(async () => {
-  server = app.listen(0)
-  await db.query("BEGIN", [])
-})
-
-afterAll(async () => {
-  await db.query("ROLLBACK", [])
-  server.close()
-  db.pool.end()
+  server = app.listen(0);
+  await db.query("BEGIN", []);
 });
 
-describe('Create User', () => {
-  it('should create a new user', async () => {
-    const response = await supertest(app)
-      .post("/signup")
-      .send({
-        username: "testUser",
-        email: "test@test.com",
-        password: "password"
-      })
+afterAll(async () => {
+  await db.query("ROLLBACK", []);
+  server.close();
+  db.pool.end();
+});
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body.token).toBeDefined()
-  })
+describe("Create User", () => {
+  it("should create a new user", async () => {
+    const response = await supertest(app).post("/signup").send({
+      username: "testUser",
+      email: "test@test.com",
+      password: "password",
+    });
 
-  it('should return an error if user already exists', async () => {
-    const response2 = await supertest(app)
-      .post("/signup")
-      .send({
-        username: "testUser",
-        email: "test@test.com",
-        password: "password"
-      })
+    expect(response.statusCode).toBe(200);
+    expect(response.body.token).toBeDefined();
+  });
 
-    expect(response2.statusCode).toBe(409)
-    expect(response2.body.token).not.toBeDefined()
-  })
+  it("should return an error if user already exists", async () => {
+    const response2 = await supertest(app).post("/signup").send({
+      username: "testUser",
+      email: "test@test.com",
+      password: "password",
+    });
 
-  it('should return an error when missing parameters', async () => {
-    const response = await supertest(app)
-      .post("/signup")
-      .send({
-        password: "password1"
-      })
+    expect(response2.statusCode).toBe(409);
+    expect(response2.body.token).not.toBeDefined();
+  });
 
-    expect(response.statusCode).toBe(400)
-    expect(response.body.error).toBe("Missing parameters")
-    expect(response.body.token).not.toBeDefined()
+  it("should return an error when missing parameters", async () => {
+    const response = await supertest(app).post("/signup").send({
+      password: "password1",
+    });
 
-    const response2 = await supertest(app)
-      .post("/signup")
-      .send({
-        username: "testUser"
-      })
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe("Missing parameters");
+    expect(response.body.token).not.toBeDefined();
 
-    expect(response2.statusCode).toBe(400)
-    expect(response2.body.error).toBe("Missing parameters")
-    expect(response2.body.token).not.toBeDefined()
+    const response2 = await supertest(app).post("/signup").send({
+      username: "testUser",
+    });
 
-    const response3 = await supertest(app)
-      .post("/signup")
-      .send({
-        email: "test@test.com"
-      })
+    expect(response2.statusCode).toBe(400);
+    expect(response2.body.error).toBe("Missing parameters");
+    expect(response2.body.token).not.toBeDefined();
 
-    expect(response3.statusCode).toBe(400)
-    expect(response3.body.error).toBe("Missing parameters")
-    expect(response3.body.token).not.toBeDefined()
-  })
-})
+    const response3 = await supertest(app).post("/signup").send({
+      email: "test@test.com",
+    });
 
-describe('sign in', () => {
-  it('should sign in user if it exists', async () => {
-    await supertest(app)
-      .post("/signup")
-      .send({
-        username: "testUser",
-        email: "test@test.com",
-        password: "password"
-      })
+    expect(response3.statusCode).toBe(400);
+    expect(response3.body.error).toBe("Missing parameters");
+    expect(response3.body.token).not.toBeDefined();
+  });
+});
 
-    const response = await supertest(app)
-      .post("/signin")
-      .send({
-        email: "test@test.com",
-        password: "password"
-      })
+describe("sign in", () => {
+  it("should sign in user if it exists", async () => {
+    await supertest(app).post("/signup").send({
+      username: "testUser",
+      email: "test@test.com",
+      password: "password",
+    });
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body.token).toBeDefined()
-  })
+    const response = await supertest(app).post("/signin").send({
+      email: "test@test.com",
+      password: "password",
+    });
 
-  it('wrong password', async () => {
-    const response = await supertest(app)
-      .post("/signin")
-      .send({
-        email: "test@test.com",
-        password: "pasword"
-      })
+    expect(response.statusCode).toBe(200);
+    expect(response.body.token).toBeDefined();
+  });
 
-    expect(response.statusCode).toBe(401)
-    expect(response.body.error).toBe("Incorrect password")
-    expect(response.body.token).not.toBeDefined()
-  })
+  it("wrong password", async () => {
+    const response = await supertest(app).post("/signin").send({
+      email: "test@test.com",
+      password: "pasword",
+    });
 
-  it('wrong email', async () => {
-    const response = await supertest(app)
-      .post("/signin")
-      .send({
-        email: "testaa@test.com",
-        password: "password"
-      })
+    expect(response.statusCode).toBe(401);
+    expect(response.body.error).toBe("Incorrect password");
+    expect(response.body.token).not.toBeDefined();
+  });
 
-    expect(response.statusCode).toBe(404)
-    expect(response.body.error).toBe("No such user")
-    expect(response.body.token).not.toBeDefined()
-  })
+  it("wrong email", async () => {
+    const response = await supertest(app).post("/signin").send({
+      email: "testaa@test.com",
+      password: "password",
+    });
 
-})
+    expect(response.statusCode).toBe(404);
+    expect(response.body.error).toBe("No such user");
+    expect(response.body.token).not.toBeDefined();
+  });
+});

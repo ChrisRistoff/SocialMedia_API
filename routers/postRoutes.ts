@@ -1,25 +1,30 @@
 import { Router } from "express";
 import { protect } from "../middleware/authMiddleware";
-import { createPost, getAllPosts, replyToPost } from "../controllers/postsController";
+import {
+  createPost,
+  getAllPosts,
+  replyToPost,
+} from "../controllers/postsController";
 import { body } from "express-validator";
 import { handleInputError } from "../middleware/validationError";
 
-export const postsRouter = Router()
-export const protectedPostsRouter = Router()
+export const postsRouter = Router();
+export const protectedPostsRouter = Router();
 
-protectedPostsRouter.post("/posts",
+protectedPostsRouter.post(
+  "/posts",
   protect,
-  body('post_content').notEmpty(),
+  body("post_content").notEmpty(),
   handleInputError,
-  createPost)
+  createPost,
+);
 
-protectedPostsRouter.post("/replies",
+protectedPostsRouter.post(
+  "/replies",
   protect,
-  body('post_content').notEmpty(),
+  body("post_content").notEmpty(),
   handleInputError,
-  replyToPost)
+  replyToPost,
+);
 
-postsRouter.get("/posts",
-  body("thread_id").notEmpty(),
-  getAllPosts
-)
+postsRouter.get("/posts", body("thread_id").notEmpty(), getAllPosts);

@@ -1,12 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 
-export const handleInputError = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req)
+export const handleInputError = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).send({ error: errors.array() })
+    return res.status(400).send({ error: errors.array() });
   }
 
-  next()
-}
+  next();
+};

@@ -2,17 +2,19 @@ import { Router } from "express";
 import { createUser, signIn } from "../controllers/userController";
 import { body } from "express-validator";
 
-export const userRouter = Router()
+export const userRouter = Router();
 
-userRouter.post("/signup",
+userRouter.post(
+  "/signup",
   body("username").notEmpty().isLength({ min: 4 }),
   body("email").isEmail(),
   body("password").notEmpty().isLength({ min: 8 }),
-  createUser
-)
+  createUser,
+);
 
-userRouter.post("/signin",
+userRouter.post(
+  "/signin",
   body("email").isEmail(),
   body("password").notEmpty(),
-  signIn
-)
+  signIn,
+);

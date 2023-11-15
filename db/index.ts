@@ -1,6 +1,5 @@
 import { Pool } from "pg";
-require('dotenv').config()
-
+require("dotenv").config();
 
 export const pool = new Pool({
   user: process.env.DB_USER,
@@ -8,8 +7,8 @@ export const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: +process.env.DB_PORT,
-})
+});
 
 export const query = async (text: string, params: any) => {
-  return pool.query(text, params)
-}
+  return pool.query(text, params);
+};
