@@ -1,25 +1,24 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import {
   createPostsModel,
   getAllPostsModel,
   replyToPostModel,
 } from "../models/postsModels";
 
-export const createPost = async (req: Request, res: Response) => {
+export const createPost = async (req: Request, res: Response, next: NextFunction) => {
   const { thread_id, user_id, post_content } = req.body;
 
   try {
     const post = await createPostsModel(thread_id, user_id, post_content);
 
-    if (!post) throw new Error();
-
     res.status(201).send({ post });
   } catch (error) {
-    res.status(500).send({ error: "Internal server error" });
+    console.log(error)
+    next(error)
   }
 };
 
-export const replyToPost = async (req: Request, res: Response) => {
+export const replyToPost = async (req: Request, res: Response, next: NextFunction) => {
   const { post_content, user_id, thread_id, reply_to_post_id } = req.body;
 
   try {
@@ -34,11 +33,12 @@ export const replyToPost = async (req: Request, res: Response) => {
 
     res.status(201).send({ reply });
   } catch (error) {
-    res.status(500).send({ error: "Internal server error" });
+    console.log(error)
+    next(error)
   }
 };
 
-export const getAllPosts = async (req: Request, res: Response) => {
+export const getAllPosts = async (req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
 
   try {
@@ -47,6 +47,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
 
     res.status(200).send({ posts });
   } catch (error) {
-    res.status(500).send({ error: "Internal server error" });
+    console.log(error)
+    next(error)
   }
 };

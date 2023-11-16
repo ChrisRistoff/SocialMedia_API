@@ -4,6 +4,7 @@ import express, { json } from "express";
 import { threadsRouter, threadsRouterProtected } from "./routers/threadRouters";
 import { postsRouter, protectedPostsRouter } from "./routers/postRoutes";
 import { userRouter } from "./routers/userRouters";
+import { customErrors, sqlErrors } from "./middleware/errorHandling";
 
 
 const app = express()
@@ -21,4 +22,6 @@ app.use("/", postsRouter)
 // user routes
 app.use("/", userRouter)
 
+//errors
+app.use(sqlErrors, customErrors)
 export default app
