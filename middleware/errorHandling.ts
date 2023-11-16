@@ -7,10 +7,10 @@ export const sqlErrors = (
   next: NextFunction,
 ) => {
   if (err.code === "23503") {
-    res.status(400).send({ msg: "ID not found" });
+    return res.status(400).send({ msg: "ID not found" });
   }
 
-  next();
+  next(err);
 };
 
 export const customErrors = (
@@ -20,10 +20,8 @@ export const customErrors = (
   next: NextFunction,
 ) => {
   if (err.errCode) {
-    res.status(err.errCode).send({ msg: err.errMsg });
+    return res.status(err.errCode).send({ msg: err.errMsg });
   } else {
-    res.status(500).send({ msg: "Internal server error" });
+    return res.status(500).send({ msg: "Internal server error" });
   }
-
-  next();
 };

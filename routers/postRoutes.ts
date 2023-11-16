@@ -5,7 +5,7 @@ import {
   getAllPosts,
   replyToPost,
 } from "../controllers/postsController";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { handleInputError } from "../middleware/validationError";
 
 export const postsRouter = Router();

@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { createThreadModel, getAllThreadsModel } from "../models/threadModels";
 
-export const createThread = async (req: Request, res: Response) => {
+export const createThread = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id, category_id, title, content } = req.body;
 
   try {
@@ -16,19 +16,20 @@ export const createThread = async (req: Request, res: Response) => {
 
     res.status(201).send({ thread });
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    console.log(error)
+    next(error)
   }
 };
 
-export const getAllThreads = async (req: Request, res: Response) => {
+export const getAllThreads = async (req: Request, res: Response, next: NextFunction) => {
   const { category_id } = req.body;
 
   try {
-    const threads = await getAllThreadsModel(1);
+    const threads = await getAllThreadsModel(category_id);
 
     res.status(200).send({ threads });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Internal server error");
+  } catch (error) {
+    console.log(error);
+    next(error)
   }
 };

@@ -29,8 +29,6 @@ export const replyToPost = async (req: Request, res: Response, next: NextFunctio
       reply_to_post_id,
     );
 
-    if (!reply) throw new Error();
-
     res.status(201).send({ reply });
   } catch (error) {
     console.log(error)
@@ -43,7 +41,6 @@ export const getAllPosts = async (req: Request, res: Response, next: NextFunctio
 
   try {
     const posts = await getAllPostsModel(thread_id);
-    if (!posts) throw new Error();
 
     res.status(200).send({ posts });
   } catch (error) {

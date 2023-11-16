@@ -1,12 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import {
-  comparePassword,
   createJWT,
   hashPassword,
 } from "../middleware/authMiddleware";
 import { createUserModel, singInModel } from "../models/userModels";
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const username = req.body.username;
     const email = req.body.email;
@@ -23,30 +22,23 @@ export const createUser = async (req: Request, res: Response) => {
     const token = createJWT(user);
 
     res.status(200).send({ token });
-  } catch (err) {
-    res.status(500).send({ error: "Server error" });
+  } catch (error) {
+    console.log(error)
+    next(error)
   }
 };
 
-export const signIn = async (req: Request, res: Response) => {
+export const signIn = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
   try {
-    const user = await singInModel(email);
-
-    if (!user) return res.status(404).send({ error: "No such user" });
-    if (user === "err") throw new Error();
-
-    const isValid = await comparePassword(password, user.password);
-
-    if (!isValid) {
-      return res.status(401).send({ error: "Incorrect password" });
-    }
+    const user = await singInModel(email, password);
 
     const token = createJWT(user);
 
     res.status(200).send({ token });
-  } catch (err) {
-    res.status(400).send({ error: "Invalid input" });
+  } catch (error) {
+    console.log(error)
+    next(error)
   }
 };

@@ -32,49 +32,43 @@ export const replyToPostModel = async (
   thread_id: number,
   reply_to_post_id: number,
 ) => {
-  try {
-    const result = await db.query(
-      `
-      INSERT INTO posts (post_content, user_id, thread_id, reply_to_post_id)
-      VALUES ($1, $2, $3, $4) RETURNING *;
+  const result = await db.query(
+    `
+    INSERT INTO posts (post_content, user_id, thread_id, reply_to_post_id)
+    VALUES ($1, $2, $3, $4) RETURNING *;
     `,
-      [post_content, user_id, thread_id, reply_to_post_id],
-    );
-
-    const post = await db.query(
-      `
-      SELECT * FROM posts WHERE post_id = $1;
+    [post_content, user_id, thread_id, reply_to_post_id],
+  );
+  const post = await db.query(
+    `
+    SELECT * FROM posts WHERE post_id = $1;
     `,
-      [reply_to_post_id],
-    );
+    [reply_to_post_id],
+  );
 
-    const user = await db.query(
-      `
-      SELECT username, created_at FROM users WHERE user_id = $1;
+  const user = await db.query(
+    `
+    SELECT username, created_at FROM users WHERE user_id = $1;
     `,
-      [user_id],
-    );
+    [user_id],
+  );
 
-    result.rows[0].post = post.rows[0];
-    result.rows[0].user = user.rows[0];
+  result.rows[0].post = post.rows[0];
+  result.rows[0].user = user.rows[0];
 
-    return result.rows[0];
-  } catch (error) {
-    return false;
-  }
+  return result.rows[0];
 };
 
 export const getAllPostsModel = async (thread_id) => {
-  try {
-    const thread = await db.query(
-      `SELECT title FROM threads WHERE thread_id=$1`,
-      [thread_id],
-    );
+  const thread = await db.query(
+    `SELECT title FROM threads WHERE thread_id=$1`,
+    [thread_id],
+  );
 
-    if (thread.rows.length < 1) return false;
+  if (thread.rows.length < 1) return Promise.reject({errCode: 400, errMsg: "ID not found"});
 
-    const posts = await db.query(
-      `
+  const posts = await db.query(
+    `
       SELECT
         p.post_id,
         p.post_content,
@@ -96,11 +90,8 @@ export const getAllPostsModel = async (thread_id) => {
       ORDER BY
         p.created_at;
     `,
-      [thread_id],
-    );
+    [thread_id],
+  );
 
-    return posts.rows;
-  } catch (error) {
-    return false;
-  }
+  return posts.rows;
 };

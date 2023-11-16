@@ -9,7 +9,8 @@ export const handleInputError = async (
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return next({ errCode: 400, errMsg: "Validation error" });
+    const err = errors.array()[0] as any;
+    return next({ errCode: 400, errMsg: `${err.msg} for ${err.path.split("_").join(" ")}` });
   }
 
   next();
