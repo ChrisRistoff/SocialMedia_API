@@ -26,7 +26,11 @@ protectedPostsRouter.post(
 protectedPostsRouter.post(
   "/replies",
   protect,
-  body("post_content").notEmpty().withMessage("Reply content can not be empty"),
+  body("post_content")
+    .notEmpty()
+    .withMessage("Reply content can not be empty")
+    .isLength({ min: 10 })
+    .withMessage("Reply content needs to be at least 10 characters long"),
   handleInputError,
   replyToPost,
 );

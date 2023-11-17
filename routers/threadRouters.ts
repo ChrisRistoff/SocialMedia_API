@@ -10,8 +10,8 @@ threadsRouterProtected.post(
   "/threads",
   body("title")
     .notEmpty().withMessage("")
-    .isLength({ min: 20 })
-    .withMessage("Thread title needs to be longer than 20 characters"),
+    .isLength({ min: 10 })
+    .withMessage("Thread title needs to be longer than 10 characters"),
   body("description")
     .isString()
     .isLength({ min: 100 })

@@ -10,14 +10,14 @@ beforeAll(async () => {
   await db.query("BEGIN", []);
 
   const register = await supertest(app).post("/signup").send({
-    username: "test",
-    email: "test@test.test",
-    password: "test",
+    username: "tester",
+    email: "test@test2.test",
+    password: "password1@",
   });
 
   const auth = await supertest(app).post("/signin").send({
-    email: "test@test.test",
-    password: "test",
+    email: "test@test2.test",
+    password: "password1@",
   });
 
   token = auth.body.token;
@@ -30,19 +30,7 @@ afterAll(async () => {
 });
 
 describe("createThread", () => {
-  it("should not create a new thread if user is not signed in", async () => {
-    const res = await supertest(app).post("/threads").send({
-      category_id: 1,
-      user_id: 1,
-      title: "test titlte",
-      content: "test content",
-    });
-
-    expect(res.statusCode).toBe(401);
-    expect(res.body.error).toBe("You need to be logged in");
-  });
-
-  it("should create a new post if user is logged in", async () => {
+  it("POST 200: Should create a new thread", async () => {
     const res = await supertest(app)
       .post("/threads")
       .set("Authorization", `Bearer ${token}`)
@@ -60,7 +48,19 @@ describe("createThread", () => {
     expect(res.body.thread.content).toBe("test content");
   });
 
-  it("should return an error if any of the IDs are wrong", async () => {
+  it("POST 401: Should return an error if the user is not signed in", async () => {
+    const res = await supertest(app).post("/threads").send({
+      category_id: 1,
+      user_id: 1,
+      title: "test titlte",
+      content: "test content",
+    });
+
+    expect(res.statusCode).toBe(401);
+    expect(res.body.error).toBe("You need to be logged in");
+  });
+
+  it("POST 400: Should return an error when category ID is not found", async () => {
     const res = await supertest(app)
       .post("/threads")
       .set("Authorization", `Bearer ${token}`)
@@ -71,26 +71,28 @@ describe("createThread", () => {
         content: "test content",
       });
 
-    expect(res.statusCode).toBe(500);
-    expect(res.body.error).toBe("Internal server error");
+    expect(res.statusCode).toBe(400);
+    expect(res.body.msg).toBe("ID not found");
+  });
 
-    const res2 = await supertest(app)
+  it("POST 400: Should return an error when user ID is not found", async () => {
+    const res = await supertest(app)
       .post("/threads")
       .set("Authorization", `Bearer ${token}`)
       .send({
         category_id: 1,
-        user_id: 25,
+        user_id: 300,
         title: "test title",
         content: "test content",
       });
 
-    expect(res2.statusCode).toBe(500);
-    expect(res2.body.error).toBe("Internal server error");
+    expect(res.statusCode).toBe(400);
+    expect(res.body.msg).toBe("ID not found");
   });
 });
 
 describe("get all threads by category_id", () => {
-  it("should return threads when given an id", async () => {
+  it("GET 200: Should return all threads of category id", async () => {
     const res = await supertest(app).get("/threads").send({
       category_id: 1,
     });
@@ -105,4 +107,22 @@ describe("get all threads by category_id", () => {
     expect(thread.post_count).toBe("2");
     expect(thread.category_id).toBe(1);
   });
+
+  it('GET 400: Should return an error when category ID is not found', async () => {
+    const res = await supertest(app).get("/threads").send({
+      category_id: 500
+    })
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.msg).toBe("ID not found")
+  })
+
+  it('GET 400: Should return an error when category ID is not given', async () => {
+    const res = await supertest(app).get("/threads").send({})
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.msg).toBe("ID not found")
+  })
+
+
 });
