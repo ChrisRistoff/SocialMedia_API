@@ -10,11 +10,21 @@ export const createUserModel = async (
     email,
   ]);
 
-  if (existingUser.rows.length > 0)
+  if (existingUser.rows.length > 0) {
     return Promise.reject({
       errCode: 409,
       errMsg: "User with this email already exists",
     });
+  }
+
+  const checkUsername = await db.query(`SELECT * FROM users WHERE username = $1`,[username])
+
+  if (checkUsername.rows.length > 0) {
+    return Promise.reject({
+      errCode: 409,
+      errMsg: "Username already taken",
+    });
+  }
 
   const user = await db.query(
     `INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING user_id, username`,

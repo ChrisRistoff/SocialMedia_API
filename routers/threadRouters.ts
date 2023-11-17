@@ -8,8 +8,14 @@ export const threadsRouter = Router();
 
 threadsRouterProtected.post(
   "/threads",
-  body("title").isString().isLength({ min: 100 }),
-  body("description").isString().isLength({ min: 100 }),
+  body("title")
+    .notEmpty().withMessage("")
+    .isLength({ min: 20 })
+    .withMessage("Thread title needs to be longer than 20 characters"),
+  body("description")
+    .isString()
+    .isLength({ min: 100 })
+    .withMessage("Thread description is too short"),
   protect,
   createThread,
 );

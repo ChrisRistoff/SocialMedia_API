@@ -20,7 +20,7 @@ describe("Create User", () => {
     const response = await supertest(app).post("/signup").send({
       username: "testUser",
       email: "test@test.com",
-      password: "password",
+      password: "password1@",
     });
 
     expect(response.statusCode).toBe(200);
@@ -31,41 +31,138 @@ describe("Create User", () => {
     const response2 = await supertest(app).post("/signup").send({
       username: "testUser",
       email: "test@test.com",
-      password: "password",
+      password: "password1@",
     });
 
     expect(response2.statusCode).toBe(409);
     expect(response2.body.token).not.toBeDefined();
   });
 
-  it("should return an error when missing parameters", async () => {
+  it("should return an error when username is missing or empty", async () => {
     const response = await supertest(app).post("/signup").send({
+      emai: "test@test.test",
       password: "password1",
     });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.error).toBe("Missing parameters");
+    expect(response.body.msg).toBe("Username can not be empty");
     expect(response.body.token).not.toBeDefined();
 
     const response2 = await supertest(app).post("/signup").send({
-      username: "testUser",
+      username: "",
+      emai: "test@test.test",
+      password: "password1",
     });
 
     expect(response2.statusCode).toBe(400);
-    expect(response2.body.error).toBe("Missing parameters");
+    expect(response2.body.msg).toBe("Username can not be empty");
     expect(response2.body.token).not.toBeDefined();
+  });
 
-    const response3 = await supertest(app).post("/signup").send({
-      email: "test@test.com",
+  it("should return an error when email is missing or empty", async () => {
+    const response = await supertest(app).post("/signup").send({
+      username: "username",
+      password: "password1",
     });
 
-    expect(response3.statusCode).toBe(400);
-    expect(response3.body.error).toBe("Missing parameters");
-    expect(response3.body.token).not.toBeDefined();
+    expect(response.statusCode).toBe(400);
+    expect(response.body.msg).toBe("Email can not be empty");
+    expect(response.body.token).not.toBeDefined();
+
+    const response2 = await supertest(app).post("/signup").send({
+      username: "asdasda",
+      email: "",
+      password: "password1",
+    });
+
+    expect(response2.statusCode).toBe(400);
+    expect(response2.body.msg).toBe("Email can not be empty");
+    expect(response2.body.token).not.toBeDefined();
+  });
+
+  it("should return an error when password is missing or empty", async () => {
+    const response = await supertest(app).post("/signup").send({
+      username: "username",
+      email: "test@test.test",
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.msg).toBe("Password can not be empty");
+    expect(response.body.token).not.toBeDefined();
+
+    const response2 = await supertest(app).post("/signup").send({
+      username: "username",
+      email: "test@test.test",
+      password: "",
+    });
+
+    expect(response2.statusCode).toBe(400);
+    expect(response2.body.msg).toBe("Password can not be empty");
+    expect(response2.body.token).not.toBeDefined();
+  });
+
+  it("should return an error when user already exists", async () => {
+    const response = await supertest(app).post("/signup").send({
+      username: "username",
+      email: "test@test.test",
+      password: "password1@"
+    });
+
+    expect(response.statusCode).toBe(409);
+    expect(response.body.msg).toBe("User with this email already exists");
+    expect(response.body.token).not.toBeDefined();
+  });
+
+  it("should return an error when password is too short", async () => {
+    const response = await supertest(app).post("/signup").send({
+      username: "username2",
+      email: "test@test2.test",
+      password: "pass"
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.msg).toBe("Password needs to be at least 8 characters long");
+    expect(response.body.token).not.toBeDefined();
+  });
+
+  it("should return an error when password does not include a number", async () => {
+    const response = await supertest(app).post("/signup").send({
+      username: "username2",
+      email: "test@test2.test",
+      password: "password"
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.msg).toBe("Password needs to contain at least one digit");
+    expect(response.body.token).not.toBeDefined();
+  });
+
+  it("should return an error when password does not include a special character", async () => {
+    const response = await supertest(app).post("/signup").send({
+      username: "username2",
+      email: "test@test2.test",
+      password: "password1"
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.msg).toBe("Password needs to contain at least one special character");
+    expect(response.body.token).not.toBeDefined();
+ });
+
+  it("should return an error when username is taken by another user", async () => {
+    const response = await supertest(app).post("/signup").send({
+      username: "testUser",
+      email: "test@test2.test",
+      password: "password1@"
+    });
+
+    expect(response.statusCode).toBe(409);
+    expect(response.body.msg).toBe("Username already taken");
+    expect(response.body.token).not.toBeDefined();
   });
 });
 
-describe("sign in", () => {
+describe.only("sign in", () => {
   it("should sign in user if it exists", async () => {
     await supertest(app).post("/signup").send({
       username: "testUser",
