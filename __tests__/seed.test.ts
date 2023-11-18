@@ -24,49 +24,28 @@ describe("seed", () => {
     });
   });
 
-  describe("categories", () => {
-    it("categories are created", async () => {
+  describe("groups", () => {
+    it("groups are created", async () => {
       const res = await db.query(
         `
-        SELECT * FROM categories;
+        SELECT * FROM groups;
       `,
         [],
       );
 
       const category = res.rows[0];
-      expect(category).toHaveProperty("category_name");
+      expect(category).toHaveProperty("group_name");
       expect(category).toHaveProperty("description");
-      expect(category.category_name).toBe("JavaScript BE");
+      expect(category.group_name).toBe("JavaScript BE");
       expect(category.description).toBe("Everything JS backend");
-      expect(category.category_id).toBe(1);
+      expect(category.group_id).toBe(1);
 
       const category1 = res.rows[1];
-      expect(category1).toHaveProperty("category_name");
+      expect(category1).toHaveProperty("group_name");
       expect(category1).toHaveProperty("description");
-      expect(category1.category_name).toBe("DATABASES");
+      expect(category1.group_name).toBe("DATABASES");
       expect(category1.description).toBe("Everything DATABASES");
-      expect(category1.category_id).toBe(2);
-    });
-  });
-
-  describe("threads", () => {
-    it("thread is created", async () => {
-      const res = await db.query(
-        `
-        SELECT * FROM threads WHERE thread_id = 1;
-      `,
-        [],
-      );
-
-      const thread = res.rows[0];
-      expect(thread).toHaveProperty("title");
-      expect(thread).toHaveProperty("content");
-      expect(thread).toHaveProperty("category_id");
-      expect(thread).toHaveProperty("user_id");
-      expect(thread.title).toBe("test thread title");
-      expect(thread.content).toBe("test thread content");
-      expect(thread.category_id).toBe(1);
-      expect(thread.user_id).toBe(1);
+      expect(category1.group_id).toBe(2);
     });
   });
 
@@ -74,17 +53,38 @@ describe("seed", () => {
     it("post is created", async () => {
       const res = await db.query(
         `
-        SELECT * FROM posts WHERE post_id = 1
+        SELECT * FROM posts WHERE post_id = 1;
       `,
         [],
       );
 
       const post = res.rows[0];
-      expect(post).toHaveProperty("post_content");
-      expect(post).toHaveProperty("thread_id");
+      expect(post).toHaveProperty("title");
+      expect(post).toHaveProperty("content");
+      expect(post).toHaveProperty("group_id");
       expect(post).toHaveProperty("user_id");
-      expect(post.post_content).toBe("test post content");
-      expect(post.thread_id).toBe(1);
+      expect(post.title).toBe("test post title");
+      expect(post.content).toBe("test post content");
+      expect(post.group_id).toBe(1);
+      expect(post.user_id).toBe(1);
+    });
+  });
+
+  describe("comment", () => {
+    it("comment is created", async () => {
+      const res = await db.query(
+        `
+        SELECT * FROM comments WHERE comment_id = 1
+      `,
+        [],
+      );
+
+      const post = res.rows[0];
+      expect(post).toHaveProperty("comment_content");
+      expect(post).toHaveProperty("post_id");
+      expect(post).toHaveProperty("user_id");
+      expect(post.comment_content).toBe("test comment content");
+      expect(post.post_id).toBe(1);
       expect(post.user_id).toBe(1);
     });
   });
@@ -93,20 +93,20 @@ describe("seed", () => {
     it("reply is created", async () => {
       const res = await db.query(
         `
-        SELECT * FROM posts WHERE post_content = 'test reply content'
+        SELECT * FROM comments WHERE reply_to_comment_id = 1
       `,
         [],
       );
 
       const reply = res.rows[0];
-      expect(reply).toHaveProperty("post_content");
+      expect(reply).toHaveProperty("comment_content");
       expect(reply).toHaveProperty("user_id");
-      expect(reply).toHaveProperty("thread_id");
-      expect(reply).toHaveProperty("reply_to_post_id");
-      expect(reply.post_content).toBe("test reply content");
+      expect(reply).toHaveProperty("post_id");
+      expect(reply).toHaveProperty("reply_to_comment_id");
+      expect(reply.comment_content).toBe("test reply content");
       expect(reply.user_id).toBe(1);
-      expect(reply.thread_id).toBe(1);
-      expect(reply.reply_to_post_id).toBe(1);
+      expect(reply.post_id).toBe(1);
+      expect(reply.reply_to_comment_id).toBe(1);
     });
   });
 });

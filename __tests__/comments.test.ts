@@ -38,49 +38,49 @@ afterAll(async () => {
 
 describe("create post", () => {
   it("POST 401: Should return an error if user is not signed in", async () => {
-    const res = await supertest(app).post("/posts").send({
+    const res = await supertest(app).post("/comments").send({
       thread_id: 1,
       user_id: 1,
-      content: "test post content",
+      content: "test comment content",
     });
 
     expect(res.statusCode).toBe(401);
     expect(res.body.error).toBe("You need to be logged in");
   });
 
-  it("POST 201: Should create a new post", async () => {
+  it("POST 201: Should create a new comment", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/comments")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        thread_id: 1,
+        post_id: 1,
         user_id: 1,
-        post_content: "test post content",
+        comment_content: "test comment content",
       });
 
-    const post = res.body.post;
+    const comment = res.body.comment;
     expect(res.statusCode).toBe(201);
-    expect(post.user.username).toBe("test");
-    expect(post.post_content).toBe("test post content");
+    expect(comment.user.username).toBe("test");
+    expect(comment.comment_content).toBe("test comment content");
   });
 
   it("POST 400: Should return an error when post content is blank", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/comments")
       .set("Authorization", `Bearer ${token}`)
       .send({
         thread_id: 1,
         user_id: 1,
-        post_content: "",
+        comment_content: "",
       });
 
     expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("Post content can not be empty")
+    expect(res.body.msg).toBe("Comment content can not be empty")
   });
 
   it("POST 400: Should return an error when post content is missing", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/comments")
       .set("Authorization", `Bearer ${token}`)
       .send({
         thread_id: 1,
@@ -88,17 +88,17 @@ describe("create post", () => {
       });
 
     expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("Post content can not be empty")
+    expect(res.body.msg).toBe("Comment content can not be empty")
   });
 
   it("POST 400: Should return an error if thread ID is not found", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/comments")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        thread_id: 45,
+        post_id: 45,
         user_id: 1,
-        post_content: "test post content",
+        comment_content: "test comment content",
       });
 
     expect(res.statusCode).toBe(400);
@@ -107,12 +107,12 @@ describe("create post", () => {
 
   it("POST 400: Should return an error if user ID is not found", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/comments")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        thread_id: 1,
+        post_id: 1,
         user_id: 45,
-        post_content: "test post content",
+        comment_content: "test comment content",
       });
 
     expect(res.statusCode).toBe(400);
@@ -121,25 +121,25 @@ describe("create post", () => {
 
   it("POST 400: Should return an error if post content is too short", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/comments")
       .set("Authorization", `Bearer ${token}`)
       .send({
         thread_id: 1,
         user_id: 45,
-        post_content: "test",
+        comment_content: "test",
       });
 
     expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("Post content needs to be at least 10 characters long");
+    expect(res.body.msg).toBe("Comment content needs to be at least 10 characters long");
   });
 });
 
 describe("replies", () => {
   it("POST 401: Should return an error when user is not signed in", async () => {
-    const res = await supertest(app).post("/posts").send({
+    const res = await supertest(app).post("/replies").send({
       thread_id: 1,
       user_id: 1,
-      post_content: "test post content",
+      post_content: "test comment content",
     });
 
     expect(res.statusCode).toBe(401);
@@ -153,71 +153,71 @@ describe("replies", () => {
       .send({
         thread_id: 1,
         user_id: 1,
-        post_content: "test reply content",
-        reply_to_post_id: 1,
+        comment_content: "test reply content",
+        reply_to_comment_id: 1,
       });
 
     expect(res.statusCode).toBe(201);
     const reply = res.body.reply;
     expect(reply.user.username).toBe("test");
-    expect(reply.post_content).toBe("test reply content");
-    expect(reply.post.post_id).toBe(1);
+    expect(reply.comment_content).toBe("test reply content");
+    expect(reply.comment.comment_id).toBe(1);
   });
 
-  it("POST 400: Should return an error when post content is empty", async () => {
+  it("POST 400: Should return an error when comment content is empty", async () => {
     const res = await supertest(app)
       .post("/replies")
       .set("Authorization", `Bearer ${token}`)
       .send({
         thread_id: 1,
         user_id: 1,
-        post_content: "",
-        reply_to_post_id: 1,
+        comment_content: "",
+        reply_to_comment_id: 1,
       });
 
     expect(res.statusCode).toBe(400);
     expect(res.body.msg).toBe("Reply content can not be empty");
   });
 
-  it("POST 400: Should return an error when post content is too short", async () => {
+  it("POST 400: Should return an error when comment content is too short", async () => {
     const res = await supertest(app)
       .post("/replies")
       .set("Authorization", `Bearer ${token}`)
       .send({
         thread_id: 1,
         user_id: 1,
-        post_content: "test",
-        reply_to_post_id: 1,
+        comment_content: "test",
+        reply_to_comment_id: 1,
       });
 
     expect(res.statusCode).toBe(400);
     expect(res.body.msg).toBe("Reply content needs to be at least 10 characters long");
   });
 
-  it("POST 400: Should return an error when reply_to_post ID can not be found", async () => {
+  it("POST 400: Should return an error when reply_to_comment ID can not be found", async () => {
     const res = await supertest(app)
       .post("/replies")
       .set("Authorization", `Bearer ${token}`)
       .send({
         thread_id: 1,
         user_id: 1,
-        post_content: "test reply content",
-        reply_to_post_id: 50000,
+        comment_content: "test reply content",
+        reply_to_comment_id: 50000,
       });
 
     expect(res.statusCode).toBe(400);
     expect(res.body.msg).toBe("ID not found");
   });
 
-  it("POST 400: Should return an error when thread ID can not be found", async () => {
+  it("POST 400: Should return an error when post ID can not be found", async () => {
     const res = await supertest(app)
       .post("/replies")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        thread_id: 312,
+        post_id: 312,
         user_id: 1,
-        post_content: "test reply content",
-        reply_to_post_id: 1,
+        comment_content: "test reply content",
+        reply_to_comment_id: 1,
       });
 
     expect(res.statusCode).toBe(400);
@@ -229,10 +229,10 @@ describe("replies", () => {
       .post("/replies")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        thread_id: 1,
+        post_id: 1,
         user_id: 2000,
-        post_content: "test reply content",
-        reply_to_post_id: 1,
+        comment_content: "test reply content",
+        reply_to_comment_id: 1,
       });
 
     expect(res.statusCode).toBe(400);
@@ -240,25 +240,25 @@ describe("replies", () => {
   });
 });
 
-describe("get all posts", () => {
+describe("get all comments", () => {
   it("POST 200: Should return an array of all posts to the user", async () => {
-    const res = await supertest(app).get("/posts").send({ thread_id: 1 });
+    const res = await supertest(app).get("/comments").send({ post_id: 1 });
 
     expect(res.statusCode).toBe(200);
-    expect(typeof res.body.posts[0]).toBe("object");
-    expect(Array.isArray(res.body.posts)).toBe(true);
-    expect(res.body.posts.length > 0).toBe(true)
+    expect(typeof res.body.comments[0]).toBe("object");
+    expect(Array.isArray(res.body.comments)).toBe(true);
+    expect(res.body.comments.length > 0).toBe(true)
   });
 
-  it("POST 400: Should return an error when ID can not be found", async () => {
-    const res = await supertest(app).get("/posts").send({ thread_id: 5000 });
+  it("GET 400: Should return an error when ID can not be found", async () => {
+    const res = await supertest(app).get("/comments").send({ post_id: 5000 });
 
     expect(res.statusCode).toBe(400);
     expect(res.body.msg).toBe("ID not found");
   });
 
-  it("POST 400: Should return an error if ID is not found", async () => {
-    const res = await supertest(app).get("/posts").send({});
+  it("GET 400: Should return an error if ID is not found", async () => {
+    const res = await supertest(app).get("/comments").send({});
 
     expect(res.statusCode).toBe(400);
     expect(res.body.msg).toBe("ID not found");

@@ -6,7 +6,7 @@ import { reply } from "./seed_data/reply";
 import { hashPassword } from "../middleware/authMiddleware";
 require("dotenv").config();
 
-export const seed = async (post: any, user: any, comment: any, reply: any) => {
+export const seed = async (thread: any, user: any, post: any, reply: any) => {
   try {
     const ctgs = await createGroups();
     console.log(ctgs.rows);
@@ -61,7 +61,7 @@ const createPost = async (post: any) => {
 const createComment = async (comment: any) => {
   return await db.query(
     `
-    INSERT INTO comments(comment_content, user_id, post_id)
+    INSERT INTO comments(comment_content, user_id, thread_id)
     VALUES ($1, $2, $3) RETURNING *
   `,
     [comment.comment_content, comment.user_id, comment.post_id],
@@ -71,7 +71,7 @@ const createComment = async (comment: any) => {
 const createReply = async (reply: any) => {
   return await db.query(
     `
-    INSERT INTO comments(comment_content, user_id, post_id, reply_to_comment_id)
+    INSERT INTO posts(comment_content, user_id, post_id, reply_to_comment_id)
     VALUES ($1, $2, $3, $4) RETURNING *
   `,
     [
