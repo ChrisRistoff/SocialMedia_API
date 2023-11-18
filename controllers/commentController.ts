@@ -3,7 +3,7 @@ import {
   createCommentModel,
   getAllCommentsModel,
   replyToCommentModel,
-} from "../models/postsModels";
+} from "../models/commentModels";
 
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
   const { post_id, user_id, comment_content} = req.body;

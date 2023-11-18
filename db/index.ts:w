@@ -61,7 +61,7 @@ const createPost = async (post: any) => {
 const createComment = async (comment: any) => {
   return await db.query(
     `
-    INSERT INTO comments(comment_content, user_id, post_id)
+    INSERT INTO comments(comment_content, user_id, thread_id)
     VALUES ($1, $2, $3) RETURNING *
   `,
     [comment.comment_content, comment.user_id, comment.post_id],
@@ -71,7 +71,7 @@ const createComment = async (comment: any) => {
 const createReply = async (reply: any) => {
   return await db.query(
     `
-    INSERT INTO comments(comment_content, user_id, post_id, reply_to_comment_id)
+    INSERT INTO posts(comment_content, user_id, post_id, reply_to_comment_id)
     VALUES ($1, $2, $3, $4) RETURNING *
   `,
     [

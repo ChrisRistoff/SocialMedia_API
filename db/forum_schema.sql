@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS posts(
     title TEXT,
     content TEXT,
     created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    group_id INTEGER REFERENCES categories(category_id),
+    group_id INTEGER REFERENCES groups(group_id),
     user_id INTEGER REFERENCES users(user_id)
 );
 
@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS comments(
     comment_content TEXT,
     created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id INTEGER REFERENCES users(user_id),
-    post_id INTEGER REFERENCES threads(thread_id),
-    reply_to_commetn_id INTEGER REFERENCES posts(post_id)
+    post_id INTEGER REFERENCES posts(post_id),
+    reply_to_comment_id INTEGER REFERENCES comments(comment_id)
 );
 
 CREATE TABLE IF NOT EXISTS reactions(

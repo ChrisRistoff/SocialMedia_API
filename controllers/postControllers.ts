@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { createPostInGroupModel, getAllPostsInGroupModel } from "../models/threadModels";
+import { createPostInGroupModel, getAllPostsInGroupModel } from "../models/postModels";
 
 export const createPostInGroup = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id, group_id, title, content } = req.body;
@@ -21,7 +21,7 @@ export const createPostInGroup = async (req: Request, res: Response, next: NextF
   }
 };
 
-export const getAllThreadsInGroup = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllPostsInGroup = async (req: Request, res: Response, next: NextFunction) => {
   const { group_id } = req.body;
 
   try {

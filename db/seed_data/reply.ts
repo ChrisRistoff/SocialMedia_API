@@ -1,6 +1,6 @@
 export const reply = {
-  post_content: "test reply content",
+  comment_content: "test reply content",
   user_id: 1,
-  thread_id: 1,
-  reply_to_post_id: 1,
+  post_id: 1,
+  reply_to_comment_id: 1,
 };
