@@ -8,15 +8,19 @@ import {
 } from "./routers/commentRoutes";
 import { userRouter } from "./routers/userRouters";
 import { customErrors, sqlErrors } from "./middleware/errorHandling";
+import { protectedGroupRouter } from "./routers/groupRouter";
 
 const app = express();
 app.use(json());
 
-//threads
+//groups
+app.use("/", protectedGroupRouter)
+
+// posts
 app.use("/", protectedPostsRouter);
 app.use("/", postsRouter);
 
-// posts
+// comments
 app.use("/", protectedCommentsRouter);
 app.use("/", commentsRouter);
 

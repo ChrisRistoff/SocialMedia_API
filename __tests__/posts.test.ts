@@ -30,7 +30,7 @@ afterAll(async () => {
 });
 
 describe("create post in a group", () => {
-  it("POST 200: Should create a new post", async () => {
+  it("POST 201: Should create a new post", async () => {
     const res = await supertest(app)
       .post("/posts")
       .set("Authorization", `Bearer ${token}`)

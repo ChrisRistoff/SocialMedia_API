@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS users(
 CREATE TABLE IF NOT EXISTS groups(
     group_id SERIAL PRIMARY KEY,
     group_name TEXT,
-    description TEXT
+    description TEXT,
+    user_id INTEGER REFERENCES users(user_id)
 );
 
 CREATE TABLE IF NOT EXISTS posts(
