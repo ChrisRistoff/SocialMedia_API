@@ -1,7 +1,15 @@
 import { NextFunction, Request, Response } from "express";
-import { createPostInGroupModel, getAllPostsInGroupModel } from "../models/postModels";
+import {
+  createPostInGroupModel,
+  getAllPostsInGroupModel,
+  getAllPostsOfUserModel,
+} from "../models/postModels";
 
-export const createPostInGroup = async (req: Request, res: Response, next: NextFunction) => {
+export const createPostInGroup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { user_id, group_id, title, content } = req.body;
 
   try {
@@ -16,12 +24,16 @@ export const createPostInGroup = async (req: Request, res: Response, next: NextF
 
     res.status(201).send({ post });
   } catch (error) {
-    console.log(error)
-    next(error)
+    console.log(error);
+    next(error);
   }
 };
 
-export const getAllPostsInGroup = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllPostsInGroup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { group_id } = req.body;
 
   try {
@@ -30,6 +42,23 @@ export const getAllPostsInGroup = async (req: Request, res: Response, next: Next
     res.status(200).send({ posts });
   } catch (error) {
     console.log(error);
-    next(error)
+    next(error);
+  }
+};
+
+export const getAllPostsOfUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { user_id } = req.params;
+
+  try {
+    const posts = await getAllPostsOfUserModel(+user_id);
+
+    res.status(200).send({ posts });
+  } catch (err) {
+    console.log(err)
+    next(err)
   }
 };

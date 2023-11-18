@@ -123,6 +123,22 @@ describe("get all posts in a group", () => {
     expect(res.statusCode).toBe(400)
     expect(res.body.msg).toBe("ID not found")
   })
-
-
 });
+
+describe('get all posts of user', () => {
+  it("GET 200: Should return all posts", async () => {
+    const res = await supertest(app).get("/posts/1")
+
+
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.posts)).toBe(true)
+    expect(res.body.posts.length).toBe(2)
+  });
+
+  it('GET 400: Should return an error when user ID is not found', async () => {
+    const res = await supertest(app).get("/posts/2200")
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.msg).toBe("ID not found")
+  })
+})

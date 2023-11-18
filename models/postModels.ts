@@ -31,7 +31,6 @@ export const createPostInGroupModel = async (
 };
 
 export const getAllPostsInGroupModel = async (group_id: number) => {
-  console.log(group_id)
   const posts = await db.query(
     `
     SELECT p.group_id, p.post_id, p.title, p.content, u.username AS creator_username,
@@ -46,7 +45,22 @@ export const getAllPostsInGroupModel = async (group_id: number) => {
     [group_id],
   );
 
-  if (posts.rows.length < 1) return Promise.reject({errCode: 400, errMsg: "ID not found"})
+  if (posts.rows.length < 1)
+    return Promise.reject({ errCode: 400, errMsg: "ID not found" });
+
+  return posts.rows;
+};
+
+export const getAllPostsOfUserModel = async (user_id: number) => {
+  const posts = await db.query(
+    `
+      SELECT * FROM posts WHERE user_id = $1
+    `,
+    [user_id],
+  );
+
+  if (posts.rows.length < 1)
+    return Promise.reject({ errCode: 400, errMsg: "ID not found" });
 
   return posts.rows;
 };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPostInGroup, getAllPostsInGroup} from "../controllers/postControllers";
+import { createPostInGroup, getAllPostsInGroup, getAllPostsOfUser} from "../controllers/postControllers";
 import { protect } from "../middleware/authMiddleware";
 import { body } from "express-validator";
 
@@ -21,3 +21,5 @@ protectedPostsRouter.post(
 );
 
 postsRouter.get("/posts", getAllPostsInGroup);
+
+postsRouter.get("/posts/:user_id", getAllPostsOfUser)

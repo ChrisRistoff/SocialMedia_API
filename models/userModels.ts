@@ -31,6 +31,11 @@ export const createUserModel = async (
     [username, email, password],
   );
 
+  await db.query(`
+    INSERT INTO posts (user_id, title, content)
+    VALUES ($1, 'Hello World!', 'I am using SM name')
+  `, [user.rows[0].user_id])
+
   return user.rows[0];
 };
 
