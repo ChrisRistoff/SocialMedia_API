@@ -11,38 +11,34 @@ CREATE TABLE IF NOT EXISTS users(
     password TEXT
 );
 
-CREATE TABLE IF NOT EXISTS categories(
-    category_id SERIAL PRIMARY KEY,
-    category_name TEXT,
+CREATE TABLE IF NOT EXISTS groups(
+    group_id SERIAL PRIMARY KEY,
+    group_name TEXT,
     description TEXT
-);
-
-CREATE TABLE IF NOT EXISTS threads(
-    thread_id SERIAL PRIMARY KEY,
-    title TEXT,
-    content TEXT,
-    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    category_id INTEGER REFERENCES categories(category_id),
-    user_id INTEGER REFERENCES users(user_id)
 );
 
 CREATE TABLE IF NOT EXISTS posts(
     post_id SERIAL PRIMARY KEY,
-    post_content TEXT,
+    title TEXT,
+    content TEXT,
+    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    group_id INTEGER REFERENCES categories(category_id),
+    user_id INTEGER REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS comments(
+    comment_id SERIAL PRIMARY KEY,
+    comment_content TEXT,
     created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id INTEGER REFERENCES users(user_id),
-    thread_id INTEGER REFERENCES threads(thread_id),
-    reply_to_post_id INTEGER REFERENCES posts(post_id)
+    post_id INTEGER REFERENCES threads(thread_id),
+    reply_to_commetn_id INTEGER REFERENCES posts(post_id)
 );
 
 CREATE TABLE IF NOT EXISTS reactions(
     reaction_id SERIAL PRIMARY KEY,
     reaction_type VARCHAR(20),
-    post_id INTEGER REFERENCES posts(post_id) NOT NULL,
+    post_id INTEGER REFERENCES posts(post_id),
+    comment_id INTEGER REFERENCES comments(comment_id),
     user_id INTEGER REFERENCES users(user_id) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS roles(
-    role VARCHAR(20),
-    user_id INTEGER REFERENCES users(user_id)
 );

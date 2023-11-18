@@ -1,32 +1,32 @@
 import { Request, Response, NextFunction } from "express";
 import {
-  createPostsModel,
-  getAllPostsModel,
-  replyToPostModel,
+  createCommentModel,
+  getAllCommentsModel,
+  replyToCommentModel,
 } from "../models/postsModels";
 
-export const createPost = async (req: Request, res: Response, next: NextFunction) => {
-  const { thread_id, user_id, post_content } = req.body;
+export const createComment = async (req: Request, res: Response, next: NextFunction) => {
+  const { post_id, user_id, comment_content} = req.body;
 
   try {
-    const post = await createPostsModel(thread_id, user_id, post_content);
+    const comment = await createCommentModel(post_id, user_id, comment_content);
 
-    res.status(201).send({ post });
+    res.status(201).send({ comment });
   } catch (error) {
     console.log(error)
     next(error)
   }
 };
 
-export const replyToPost = async (req: Request, res: Response, next: NextFunction) => {
-  const { post_content, user_id, thread_id, reply_to_post_id } = req.body;
+export const replyToComment = async (req: Request, res: Response, next: NextFunction) => {
+  const { comment_content, user_id, post_id, reply_to_comment_id } = req.body;
 
   try {
-    const reply = await replyToPostModel(
-      post_content,
+    const reply = await replyToCommentModel(
+      comment_content,
       user_id,
-      thread_id,
-      reply_to_post_id,
+      post_id,
+      reply_to_comment_id,
     );
 
     res.status(201).send({ reply });
@@ -36,13 +36,13 @@ export const replyToPost = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-export const getAllPosts = async (req: Request, res: Response, next: NextFunction) => {
-  const { thread_id } = req.body;
+export const getAllComments = async (req: Request, res: Response, next: NextFunction) => {
+  const { post_id } = req.body;
 
   try {
-    const posts = await getAllPostsModel(thread_id);
+    const comments = await getAllCommentsModel(post_id);
 
-    res.status(200).send({ posts });
+    res.status(200).send({ comments });
   } catch (error) {
     console.log(error)
     next(error)

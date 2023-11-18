@@ -4,18 +4,18 @@ interface FlexibleObject {
   [key: string]: any;
 }
 
-export const createThreadModel = async (
+export const createPostInGroupModel = async (
   user_id: number,
-  category_id: number,
+  group_id: number,
   title: string,
   post_content: string,
 ) => {
   const result: FlexibleObject = await db.query(
     `
-    INSERT INTO threads (user_id, category_id, title, content)
+    INSERT INTO posts (user_id, group_id, title, content)
     VALUES ($1, $2, $3, $4) RETURNING *;
     `,
-    [user_id, category_id, title, post_content],
+    [user_id, group_id, title, post_content],
   );
 
   const user = await db.query(`SELECT * FROM users WHERE user_id = $1`, [
@@ -30,23 +30,23 @@ export const createThreadModel = async (
   return result.rows[0];
 };
 
-export const getAllThreadsModel = async (category_id: number) => {
-  console.log(category_id)
-  const threads = await db.query(
+export const getAllPostsInGroupModel = async (group_id: number) => {
+  console.log(group_id)
+  const posts = await db.query(
     `
-    SELECT t.category_id, t.thread_id, t.title, t.content, u.username AS creator_username,
-    COUNT(p.post_id) AS post_count,
-    MAX(p.created_at) AS last_post_date
-    FROM threads t
-    LEFT JOIN posts p ON p.thread_id = t.thread_id
-    LEFT JOIN users u ON t.user_id = u.user_id
-    WHERE t.category_id = $1
-    GROUP BY t.category_id, t.thread_id, t.title, t.content, u.username;
+    SELECT p.group_id, p.post_id, p.title, p.content, u.username AS creator_username,
+    COUNT(c.comment_id) AS comment_count,
+    MAX(c.created_at) AS last_comment_date
+    FROM posts p
+    LEFT JOIN comments c ON c.post_id = p.post_id
+    LEFT JOIN users u ON p.user_id = u.user_id
+    WHERE p.group_id = $1
+    GROUP BY p.group_id, p.post_id, p.title, p.content, u.username;
     `,
-    [category_id],
+    [group_id],
   );
 
-  if (threads.rows.length < 1) return Promise.reject({errCode: 400, errMsg: "ID not found"})
+  if (posts.rows.length < 1) return Promise.reject({errCode: 400, errMsg: "ID not found"})
 
-  return threads.rows;
+  return posts.rows;
 };
