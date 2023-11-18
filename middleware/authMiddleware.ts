@@ -32,7 +32,7 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
   const bearer = customReq.headers.authorization;
 
   if (!bearer) {
-    res.status(401).send({ error: "You need to be logged in" });
+    res.status(401).send({ msg: "You need to be logged in" });
     return;
   }
 
@@ -40,7 +40,7 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
   const token = split_token[1];
 
   if (!token) {
-    res.status(401).send({ error: "Token is not valid" });
+    res.status(401).send({ msg: "Token is not valid" });
     return;
   }
 
@@ -51,6 +51,6 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(401).send({ error: "Token not valid" });
+    return res.status(401).send({ msg: "Token not valid" });
   }
 };

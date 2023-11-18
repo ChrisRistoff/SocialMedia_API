@@ -1,10 +1,11 @@
 import * as db from "./index";
-import { post, post2} from "./seed_data/post";
+import * as post from "./seed_data/post";
 import { user } from "./seed_data/user";
 import { comment } from "./seed_data/comment";
 import { reply } from "./seed_data/reply";
 import { hashPassword } from "../middleware/authMiddleware";
-require("dotenv").config();
+
+console.log(process.env.DB_NAME)
 
 export const seed = async (post: any, user: any, comment: any, reply: any) => {
   try {
@@ -12,14 +13,16 @@ export const seed = async (post: any, user: any, comment: any, reply: any) => {
     console.log(ctgs.rows);
     const usr = await createUser(user);
     console.log(usr.rows);
-    const thrd = await createPost(post);
-    const thrd2 = await createPost(post2);
+    const thrd = await createPost(post.post);
+    const thrd2 = await createPost(post.post2);
     console.log(thrd.rows);
     console.log(thrd2.rows);
     const pst = await createComment(comment);
     console.log(pst.rows);
     const rpl = await createReply(reply);
     console.log(rpl.rows);
+    if(process.env.NODE_ENV !== "test")
+    db.pool.end()
   } catch (err) {
     console.log(err);
   }

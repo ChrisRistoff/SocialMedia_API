@@ -29,13 +29,13 @@ afterAll(async () => {
   db.pool.end();
 });
 
-describe("createThread", () => {
-  it("POST 200: Should create a new thread", async () => {
+describe("create post in a group", () => {
+  it("POST 200: Should create a new post", async () => {
     const res = await supertest(app)
-      .post("/threads")
+      .post("/posts")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        category_id: 1,
+        group_id: 1,
         user_id: 1,
         title: "test title",
         content: "test content",
@@ -43,29 +43,29 @@ describe("createThread", () => {
 
     expect(res.statusCode).toBe(201);
     expect(typeof res.body).toBe("object");
-    expect(res.body.thread.user.username).toBe("test");
-    expect(res.body.thread.title).toBe("test title");
-    expect(res.body.thread.content).toBe("test content");
+    expect(res.body.post.user.username).toBe("test");
+    expect(res.body.post.title).toBe("test title");
+    expect(res.body.post.content).toBe("test content");
   });
 
   it("POST 401: Should return an error if the user is not signed in", async () => {
-    const res = await supertest(app).post("/threads").send({
-      category_id: 1,
+    const res = await supertest(app).post("/posts").send({
+      group_id: 1,
       user_id: 1,
-      title: "test titlte",
+      title: "test title",
       content: "test content",
     });
 
     expect(res.statusCode).toBe(401);
-    expect(res.body.error).toBe("You need to be logged in");
+    expect(res.body.msg).toBe("You need to be logged in");
   });
 
-  it("POST 400: Should return an error when category ID is not found", async () => {
+  it("POST 400: Should return an error when group ID is not found", async () => {
     const res = await supertest(app)
-      .post("/threads")
+      .post("/posts")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        category_id: 24,
+        group_id: 24,
         user_id: 1,
         title: "test title",
         content: "test content",
@@ -77,10 +77,10 @@ describe("createThread", () => {
 
   it("POST 400: Should return an error when user ID is not found", async () => {
     const res = await supertest(app)
-      .post("/threads")
+      .post("/posts")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        category_id: 1,
+        group_id: 1,
         user_id: 300,
         title: "test title",
         content: "test content",
@@ -91,34 +91,34 @@ describe("createThread", () => {
   });
 });
 
-describe("get all threads by category_id", () => {
-  it("GET 200: Should return all threads of category id", async () => {
-    const res = await supertest(app).get("/threads").send({
-      category_id: 1,
+describe("get all posts in a group", () => {
+  it("GET 200: Should return all posts", async () => {
+    const res = await supertest(app).get("/posts").send({
+      group_id: 1,
     });
 
-    const thread = res.body.threads[0];
+    const post = res.body.posts[0];
 
     expect(res.statusCode).toBe(200);
-    expect(thread.creator_username).toBe("test");
-    expect(thread.title).toBe("test thread title");
-    expect(thread.content).toBe("test thread content");
-    expect(thread.thread_id).toBe(1);
-    expect(thread.post_count).toBe("2");
-    expect(thread.category_id).toBe(1);
+    expect(post.creator_username).toBe("test");
+    expect(post.title).toBe("test post title");
+    expect(post.content).toBe("test post content");
+    expect(post.post_id).toBe(1);
+    expect(post.comment_count).toBe("2");
+    expect(post.group_id).toBe(1);
   });
 
-  it('GET 400: Should return an error when category ID is not found', async () => {
-    const res = await supertest(app).get("/threads").send({
-      category_id: 500
+  it('GET 400: Should return an error when group ID is not found', async () => {
+    const res = await supertest(app).get("/posts").send({
+      group_id: 500
     })
 
     expect(res.statusCode).toBe(400)
     expect(res.body.msg).toBe("ID not found")
   })
 
-  it('GET 400: Should return an error when category ID is not given', async () => {
-    const res = await supertest(app).get("/threads").send({})
+  it('GET 400: Should return an error when group ID is not given', async () => {
+    const res = await supertest(app).get("/posts").send({})
 
     expect(res.statusCode).toBe(400)
     expect(res.body.msg).toBe("ID not found")

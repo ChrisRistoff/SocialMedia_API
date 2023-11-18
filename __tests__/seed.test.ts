@@ -1,5 +1,4 @@
 import * as db from "../db/index";
-require("dotenv").config();
 
 afterAll(() => db.pool.end());
 

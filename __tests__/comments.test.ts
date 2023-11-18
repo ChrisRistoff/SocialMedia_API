@@ -36,7 +36,7 @@ afterAll(async () => {
   db.pool.end();
 });
 
-describe("create post", () => {
+describe("create comment", () => {
   it("POST 401: Should return an error if user is not signed in", async () => {
     const res = await supertest(app).post("/comments").send({
       thread_id: 1,
@@ -45,7 +45,7 @@ describe("create post", () => {
     });
 
     expect(res.statusCode).toBe(401);
-    expect(res.body.error).toBe("You need to be logged in");
+    expect(res.body.msg).toBe("You need to be logged in");
   });
 
   it("POST 201: Should create a new comment", async () => {
@@ -64,7 +64,7 @@ describe("create post", () => {
     expect(comment.comment_content).toBe("test comment content");
   });
 
-  it("POST 400: Should return an error when post content is blank", async () => {
+  it("POST 400: Should return an error when comment content is blank", async () => {
     const res = await supertest(app)
       .post("/comments")
       .set("Authorization", `Bearer ${token}`)
@@ -119,7 +119,7 @@ describe("create post", () => {
     expect(res.body.msg).toBe("ID not found");
   });
 
-  it("POST 400: Should return an error if post content is too short", async () => {
+  it("POST 400: Should return an error if comment content is too short", async () => {
     const res = await supertest(app)
       .post("/comments")
       .set("Authorization", `Bearer ${token}`)
@@ -139,11 +139,11 @@ describe("replies", () => {
     const res = await supertest(app).post("/replies").send({
       thread_id: 1,
       user_id: 1,
-      post_content: "test comment content",
+      comment_content: "test comment content",
     });
 
     expect(res.statusCode).toBe(401);
-    expect(res.body.error).toBe("You need to be logged in");
+    expect(res.body.msg).toBe("You need to be logged in");
   });
 
   it("POST 200: Should create a reply", async () => {
@@ -209,7 +209,7 @@ describe("replies", () => {
     expect(res.body.msg).toBe("ID not found");
   });
 
-  it("POST 400: Should return an error when post ID can not be found", async () => {
+  it("POST 400: Should return an error when comment ID can not be found", async () => {
     const res = await supertest(app)
       .post("/replies")
       .set("Authorization", `Bearer ${token}`)
@@ -241,7 +241,7 @@ describe("replies", () => {
 });
 
 describe("get all comments", () => {
-  it("POST 200: Should return an array of all posts to the user", async () => {
+  it("POST 200: Should return an array of all comments to the user", async () => {
     const res = await supertest(app).get("/comments").send({ post_id: 1 });
 
     expect(res.statusCode).toBe(200);

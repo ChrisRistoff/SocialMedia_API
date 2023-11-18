@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS forum_db;
-CREATE DATABASE forum_db;
+DROP DATABASE IF EXISTS sm_db;
+CREATE DATABASE sm_db;
 
-\c forum_db
+\c sm_db
 
 CREATE TABLE IF NOT EXISTS users(
     user_id SERIAL PRIMARY KEY,
