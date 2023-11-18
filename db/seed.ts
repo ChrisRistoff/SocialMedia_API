@@ -6,7 +6,7 @@ import { reply } from "./seed_data/reply";
 import { hashPassword } from "../middleware/authMiddleware";
 require("dotenv").config();
 
-export const seed = async (thread: any, user: any, post: any, reply: any) => {
+export const seed = async (post: any, user: any, comment: any, reply: any) => {
   try {
     const ctgs = await createGroups();
     console.log(ctgs.rows);

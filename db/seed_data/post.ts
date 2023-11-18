@@ -1,7 +1,7 @@
 export const post = {
   title: "test post title",
-  content: "test psot content",
-  grop_id: 1,
+  content: "test post content",
+  group_id: 1,
   user_id: 1,
 };
 
