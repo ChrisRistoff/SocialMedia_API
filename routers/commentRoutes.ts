@@ -36,7 +36,7 @@ protectedCommentsRouter.post(
 );
 
 commentsRouter.get(
-  "/posts",
+  "/comments",
   body("post_id").notEmpty().withMessage("Post ID required"),
   getAllComments,
 );

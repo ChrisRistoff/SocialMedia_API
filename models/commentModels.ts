@@ -7,7 +7,7 @@ export const createCommentModel = async (
 ) => {
   const result = await db.query(
     `
-      INSERT INTO comments (thread_id, user_id, comment_content)
+      INSERT INTO comments (post_id, user_id, comment_content)
       VALUES ($1, $2, $3) RETURNiNG *
     `,
     [thread_id, user_id, comment_content],
@@ -34,7 +34,7 @@ export const replyToCommentModel = async (
 ) => {
   const result = await db.query(
     `
-    INSERT INTO comments (comment_content, user_id, thread_id, reply_to_comment_id)
+    INSERT INTO comments (comment_content, user_id, post_id, reply_to_comment_id)
     VALUES ($1, $2, $3, $4) RETURNING *;
     `,
     [comment_content, user_id, thread_id, reply_to_comment_id],
@@ -59,10 +59,10 @@ export const replyToCommentModel = async (
   return result.rows[0];
 };
 
-export const getAllCommentsModel = async (thread_id) => {
+export const getAllCommentsModel = async (post_id) => {
   const thread = await db.query(
-    `SELECT title FROM threads WHERE thread_id=$1`,
-    [thread_id],
+    `SELECT title FROM posts WHERE post_id=$1`,
+    [post_id],
   );
 
   if (thread.rows.length < 1) return Promise.reject({errCode: 400, errMsg: "ID not found"});
@@ -82,15 +82,15 @@ export const getAllCommentsModel = async (thread_id) => {
       FROM
         comments c
       JOIN
-        users u ON p.user_id = u.user_id
+        users u ON c.user_id = u.user_id
       LEFT JOIN
         comments rc ON c.reply_to_comment_id = rc.comment_id
       WHERE
-        c.thread_id = $1
+        c.post_id = $1
       ORDER BY
         c.created_at;
     `,
-    [thread_id],
+    [post_id],
   );
 
   return comments.rows;
