@@ -3,13 +3,20 @@ import app from "../app";
 import * as db from "../db/index";
 import { Server } from "http";
 
+beforeEach(async () => {
+  await db.query("BEGIN", []);
+})
+
+afterEach(async () => {
+  await db.query("ROLLBACK", []);
+})
+
 let server: Server;
 let token: string;
 beforeAll(async () => {
   server = app.listen(0);
-  await db.query("BEGIN", []);
 
-  const register = await supertest(app).post("/signup").send({
+  await supertest(app).post("/signup").send({
     username: "tester",
     email: "test@test2.test",
     password: "password1@",
@@ -24,7 +31,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.query("ROLLBACK", []);
   server.close();
   db.pool.end();
 });
@@ -139,4 +145,52 @@ describe('create group', () => {
     expect(res.statusCode).toBe(400)
     expect(res.body.msg).toBe("ID not found")
   })
+})
+
+describe('join a group as a member', () => {
+  it('POST 201: Should return a message saying user successfully joined the group', async () => {
+    const res = await supertest(app)
+      .post("/join_group/1")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ user_id: 1 })
+
+    expect(res.statusCode).toBe(201)
+    expect(res.body.msg).toBe("You have successfully joined the group")
+  })
+
+  it('POST 409: Should return an error if a user who is part of the group tries to join it', async () => {
+     await supertest(app)
+      .post("/join_group/1")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ user_id: 1 })
+
+    const res = await supertest(app)
+      .post("/join_group/1")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ user_id: 1 })
+
+    expect(res.statusCode).toBe(409)
+    expect(res.body.msg).toBe("You are already a member of the group")
+  })
+
+  it('POST 400: Should return an error when user ID can not be found', async () => {
+    const res = await supertest(app)
+      .post("/join_group/1")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ user_id: 100 })
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.msg).toBe("ID not found")
+  })
+
+  it('POST 400: Should return an error when group ID can not be found', async () => {
+    const res = await supertest(app)
+      .post("/join_group/100")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ user_id: 1})
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.msg).toBe("ID not found")
+  })
+
 })

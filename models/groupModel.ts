@@ -8,3 +8,12 @@ export const createGroupModel = async(group_name: string, description: string, u
 
   return group.rows[0]
 }
+
+export const joinGroupModel = async (group_id: number, user_id: number) => {
+  const group = await db.query(`
+    INSERT INTO group_members (user_id, group_id)
+    VALUES ($1, $2) RETURNING *
+  `, [user_id, group_id])
+
+  return "You have successfully joined the group"
+}

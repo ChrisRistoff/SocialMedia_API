@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { protect } from "../middleware/authMiddleware";
-import { createGroup } from "../controllers/groupController";
+import { createGroup, joinGroup } from "../controllers/groupController";
 import { body } from "express-validator";
 import { handleInputError } from "../middleware/validationError";
 
@@ -16,5 +16,7 @@ protectedGroupRouter.post(
     .isLength({ min: 10 })
     .withMessage("Group description needs to be at least 10 characters long"),
   handleInputError,
-  createGroup
+  createGroup,
 );
+
+protectedGroupRouter.post("/join_group/:group_id", protect, joinGroup);

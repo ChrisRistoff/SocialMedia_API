@@ -18,6 +18,12 @@ CREATE TABLE IF NOT EXISTS groups(
     user_id INTEGER REFERENCES users(user_id)
 );
 
+CREATE TABLE IF NOT EXISTS group_members(
+    user_id INTEGER REFERENCES users(user_id),
+    group_id INTEGER REFERENCES groups(group_id),
+    PRIMARY KEY(user_id, group_id)
+);
+
 CREATE TABLE IF NOT EXISTS posts(
     post_id SERIAL PRIMARY KEY,
     title TEXT,

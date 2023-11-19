@@ -10,6 +10,10 @@ export const sqlErrors = (
     return res.status(400).send({ msg: "ID not found" });
   }
 
+  if (err.code === "23505") {
+    return res.status(409).send({ msg: "You are already a member of the group"})
+  }
+
   next(err);
 };
 
