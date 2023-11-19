@@ -246,7 +246,7 @@ describe("get all comments to a post", () => {
   it("GET 400: Should return an error when ID can not be found", async () => {
     const res = await supertest(app).get("/post/500/comments")
 
-    expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("ID not found");
+    expect(res.statusCode).toBe(404);
+    expect(res.body.msg).toBe("Post with ID 500 not found");
   });
 });

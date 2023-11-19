@@ -9,7 +9,7 @@ export const postsRouter = Router();
 protectedPostsRouter.post(
   "/group/:group_id/post",
   body("title")
-    .notEmpty().withMessage("")
+    .notEmpty().withMessage("Group title can not be empty")
     .isLength({ min: 10 })
     .withMessage("Post title needs to be longer than 10 characters"),
   body("description")

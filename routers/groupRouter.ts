@@ -1,15 +1,21 @@
 import { Router } from "express";
 import { protect } from "../middleware/authMiddleware";
-import { createGroup, getGroupsOfUser, getMembersOfGroup, joinGroup } from "../controllers/groupController";
+import {
+  createGroup,
+  getGroupsOfUser,
+  getMembersOfGroup,
+  joinGroup,
+} from "../controllers/groupController";
 import { body } from "express-validator";
 import { handleInputError } from "../middleware/validationError";
 
 export const protectedGroupRouter = Router();
-export const groupRouter = Router()
+export const groupRouter = Router();
 
 protectedGroupRouter.post(
   "/groups",
   protect,
+  body("user_id").notEmpty().withMessage("User ID can not be empty"),
   body("group_name").notEmpty().withMessage("Group name can not be empty"),
   body("description")
     .notEmpty()
@@ -22,5 +28,5 @@ protectedGroupRouter.post(
 
 protectedGroupRouter.post("/join_group/:group_id", protect, joinGroup);
 
-groupRouter.get("/group/:group_id/members", getMembersOfGroup)
-groupRouter.get("/user/:user_id/groups", getGroupsOfUser)
+groupRouter.get("/group/:group_id/members", getMembersOfGroup);
+groupRouter.get("/user/:user_id/groups", getGroupsOfUser);

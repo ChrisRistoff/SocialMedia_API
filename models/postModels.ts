@@ -46,7 +46,7 @@ export const getAllPostsInGroupModel = async (group_id: number) => {
   );
 
   if (posts.rows.length < 1)
-    return Promise.reject({ errCode: 400, errMsg: "ID not found" });
+    return Promise.reject({ errCode: 404, errMsg: `Group with ID ${group_id} not found`});
 
   return posts.rows;
 };
@@ -60,7 +60,7 @@ export const getAllPostsOfUserModel = async (user_id: number) => {
   );
 
   if (posts.rows.length < 1)
-    return Promise.reject({ errCode: 400, errMsg: "ID not found" });
+    return Promise.reject({ errCode: 404, errMsg: `User with ID ${user_id} not found`});
 
   return posts.rows;
 };

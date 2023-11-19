@@ -105,8 +105,8 @@ describe("get all posts in a group", () => {
   it('GET 400: Should return an error when group ID is not found', async () => {
     const res = await supertest(app).get("/group/500/posts")
 
-    expect(res.statusCode).toBe(400)
-    expect(res.body.msg).toBe("ID not found")
+    expect(res.statusCode).toBe(404)
+    expect(res.body.msg).toBe("Group with ID 500 not found")
   })
 
 });
@@ -124,7 +124,7 @@ describe('get all posts of user', () => {
   it('GET 400: Should return an error when user ID is not found', async () => {
     const res = await supertest(app).get("/posts/2200")
 
-    expect(res.statusCode).toBe(400)
-    expect(res.body.msg).toBe("ID not found")
+    expect(res.statusCode).toBe(404)
+    expect(res.body.msg).toBe("User with ID 2200 not found")
   })
 })

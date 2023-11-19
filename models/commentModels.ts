@@ -5,13 +5,6 @@ export const createCommentModel = async (
   user_id: number,
   comment_content: string,
 ) => {
-  const result = await db.query(
-    `
-      INSERT INTO comments (post_id, user_id, comment_content)
-      VALUES ($1, $2, $3) RETURNiNG *
-    `,
-    [thread_id, user_id, comment_content],
-  );
 
   const user = await db.query(
     `
@@ -21,6 +14,13 @@ export const createCommentModel = async (
     [user_id],
   );
 
+  const result = await db.query(
+    `
+      INSERT INTO comments (post_id, user_id, comment_content)
+      VALUES ($1, $2, $3) RETURNiNG *
+    `,
+    [thread_id, user_id, comment_content],
+  );
   result.rows[0].user = user.rows[0];
 
   return result.rows[0];
@@ -53,19 +53,22 @@ export const replyToCommentModel = async (
     [user_id],
   );
 
-  result.rows[0].comment= comment.rows[0];
+  result.rows[0].comment = comment.rows[0];
   result.rows[0].user = user.rows[0];
 
   return result.rows[0];
 };
 
-export const getAllCommentsModel = async (post_id) => {
-  const thread = await db.query(
-    `SELECT title FROM posts WHERE post_id=$1`,
-    [post_id],
-  );
+export const getAllCommentsModel = async (post_id: number) => {
+  const thread = await db.query(`SELECT title FROM posts WHERE post_id=$1`, [
+    post_id,
+  ]);
 
-  if (thread.rows.length < 1) return Promise.reject({errCode: 400, errMsg: "ID not found"});
+  if (thread.rows.length < 1)
+    return Promise.reject({
+      errCode: 404,
+      errMsg: `Post with ID ${post_id} not found`,
+    });
 
   const comments = await db.query(
     `
@@ -86,13 +89,13 @@ export const getAllCommentsModel = async (post_id) => {
       c.created_at;
     `,
     [post_id],
-  )
+  );
 
-  const commentsIndId = new Map()
+  const commentsIndId = new Map();
 
   for (let i = 0; i < comments.rows.length; i++) {
-    commentsIndId.set(comments.rows[i].comment_id, i)
-    comments.rows[i].replies = []
+    commentsIndId.set(comments.rows[i].comment_id, i);
+    comments.rows[i].replies = [];
   }
 
   const replies = await db.query(
@@ -118,8 +121,10 @@ export const getAllCommentsModel = async (post_id) => {
   );
 
   for (let i = 0; i < replies.rows.length; i++) {
-    if(commentsIndId.get(replies.rows[i].reply_to_comment_id) !== undefined) {
-      comments.rows[commentsIndId.get(replies.rows[i].reply_to_comment_id)].replies.push(replies.rows[i])
+    if (commentsIndId.get(replies.rows[i].reply_to_comment_id) !== undefined) {
+      comments.rows[
+        commentsIndId.get(replies.rows[i].reply_to_comment_id)
+      ].replies.push(replies.rows[i]);
     }
   }
 
