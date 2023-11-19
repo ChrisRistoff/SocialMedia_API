@@ -11,12 +11,12 @@ beforeAll(async () => {
 
   const register = await supertest(app).post("/signup").send({
     username: "tester",
-    email: "test@test2.test",
+    email: "tester@test.test",
     password: "password1@",
   });
 
   const auth = await supertest(app).post("/signin").send({
-    email: "test@test2.test",
+    email: "tester@test.test",
     password: "password1@",
   });
 

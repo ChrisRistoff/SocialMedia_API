@@ -26,6 +26,8 @@ export const seed = async (
     console.log(cmts);
     const rpls = await createReplies(replies);
     console.log(rpls);
+    const grpjoin = await joinUsersInGroup(users);
+    console.log(grpjoin);
     if (process.env.NODE_ENV !== "test") db.pool.end();
   } catch (err) {
     console.log(err);
@@ -33,7 +35,7 @@ export const seed = async (
 };
 
 const createUsers = async (users: any) => {
-  const result = []
+  const result = [];
 
   for (const user of users) {
     user.password = await hashPassword(user.password);
@@ -44,10 +46,10 @@ const createUsers = async (users: any) => {
       `,
       [user.username, user.email, user.password],
     );
-    result.push(newUser.rows[0])
+    result.push(newUser.rows[0]);
   }
 
-  return result
+  return result;
 };
 
 const createGroups = async (groups: any) => {
@@ -86,7 +88,7 @@ const createPosts = async (posts: any) => {
 };
 
 const createComments = async (comments: any) => {
-  const result = []
+  const result = [];
 
   for (const comment of comments) {
     const newComment = await db.query(
@@ -96,14 +98,14 @@ const createComments = async (comments: any) => {
       `,
       [comment.comment_content, comment.user_id, comment.post_id],
     );
-    result.push(newComment.rows[0])
+    result.push(newComment.rows[0]);
   }
 
-  return result
+  return result;
 };
 
 const createReplies = async (replies: any) => {
-  const result = []
+  const result = [];
 
   for (const reply of replies) {
     const newReply = await db.query(
@@ -118,9 +120,26 @@ const createReplies = async (replies: any) => {
         reply.reply_to_comment_id,
       ],
     );
-    result.push(newReply.rows[0])
+    result.push(newReply.rows[0]);
   }
-  return result
+  return result;
+};
+
+const joinUsersInGroup = async (users: any) => {
+  const result = [];
+
+  for (let i = 0; i < users.length - 1; i++) {
+    const groupJoined = await db.query(
+      `
+      INSERT INTO group_members (user_id, group_id)
+      VALUES ($1, 1) RETURNING *
+      `,
+      [i + 1],
+    );
+
+    result.push(groupJoined.rows);
+  }
+  return result;
 };
 
 seed(groups, posts, users, comments, replies).then(() => {
