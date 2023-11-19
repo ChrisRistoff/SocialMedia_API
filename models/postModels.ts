@@ -9,7 +9,18 @@ export const createPostInGroupModel = async (
   group_id: number,
   title: string,
   post_content: string,
+  username: string,
 ) => {
+  const user = await db.query(
+    `
+    SELECT * FROM users WHERE user_id = $1;
+  `,
+    [user_id],
+  );
+
+  if (user.rows.length < 1)
+    return Promise.reject({ errCode: 404, errMsg: "User does not exist" });
+
   const result: FlexibleObject = await db.query(
     `
     INSERT INTO posts (user_id, group_id, title, content)
@@ -18,14 +29,7 @@ export const createPostInGroupModel = async (
     [user_id, group_id, title, post_content],
   );
 
-  const user = await db.query(`SELECT * FROM users WHERE user_id = $1`, [
-    user_id,
-  ]);
-
-  result.rows[0].user = {
-    username: user.rows[0].username,
-    created_at: user.rows[0].created_at,
-  };
+  result.rows[0].user = username;
 
   return result.rows[0];
 };
@@ -46,12 +50,25 @@ export const getAllPostsInGroupModel = async (group_id: number) => {
   );
 
   if (posts.rows.length < 1)
-    return Promise.reject({ errCode: 404, errMsg: `Group with ID ${group_id} not found`});
+    return Promise.reject({
+      errCode: 404,
+      errMsg: `Group with ID ${group_id} not found`,
+    });
 
   return posts.rows;
 };
 
 export const getAllPostsOfUserModel = async (user_id: number) => {
+  const user = await db.query(
+    `
+    SELECT * FROM users WHERE user_id = $1;
+    `,
+    [user_id],
+  );
+
+  if (user.rows.length < 1)
+    return Promise.reject({ errCode: 404, errMsg: "User does not exist" });
+
   const posts = await db.query(
     `
       SELECT * FROM posts WHERE user_id = $1
@@ -60,7 +77,10 @@ export const getAllPostsOfUserModel = async (user_id: number) => {
   );
 
   if (posts.rows.length < 1)
-    return Promise.reject({ errCode: 404, errMsg: `User with ID ${user_id} not found`});
+    return Promise.reject({
+      errCode: 404,
+      errMsg: `User with ID ${user_id} not found`,
+    });
 
   return posts.rows;
 };

@@ -18,10 +18,13 @@ export const createJWT = (user: any): string => {
   const secret = process.env.JWT_SECRET as string;
   const token = jwt.sign(
     {
-      id: user.user_id,
+      user_id: user.user_id,
       username: user.username,
     },
     secret,
+    {
+      expiresIn: "1h"
+    }
   );
 
   return token;
@@ -30,6 +33,8 @@ export const createJWT = (user: any): string => {
 export const protect = (req: Request, res: Response, next: NextFunction) => {
   const customReq = req as CustomRequest;
   const bearer = customReq.headers.authorization;
+
+  console.log(req.body.payload)
 
   if (!bearer) {
     res.status(401).send({ msg: "You need to be logged in" });

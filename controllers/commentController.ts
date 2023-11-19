@@ -5,12 +5,18 @@ import {
   replyToCommentModel,
 } from "../models/commentModels";
 
+interface CustomRequest extends Request {
+  user: any;
+}
+
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
-  const { user_id, comment_content} = req.body;
+  const custReq = req as CustomRequest
+  const { comment_content} = req.body;
   const { post_id } = req.params
+  const { user_id, username } = custReq.user
 
   try {
-    const comment = await createCommentModel(+post_id, user_id, comment_content);
+    const comment = await createCommentModel(+post_id, user_id, comment_content, username);
 
     res.status(201).send({ comment });
   } catch (error) {
@@ -33,8 +39,11 @@ export const getAllComments = async (req: Request, res: Response, next: NextFunc
 };
 
 export const replyToComment = async (req: Request, res: Response, next: NextFunction) => {
-  const { comment_content, user_id, post_id } = req.body;
+  const custReq = req as CustomRequest
+  const { comment_content, post_id } = req.body;
   const { reply_to_comment_id } = req.params
+  const { user_id, username } = custReq.user
+
 
   try {
     const reply = await replyToCommentModel(
@@ -42,6 +51,7 @@ export const replyToComment = async (req: Request, res: Response, next: NextFunc
       user_id,
       post_id,
       +reply_to_comment_id,
+      username
     );
 
     res.status(201).send({ reply });

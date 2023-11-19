@@ -6,12 +6,19 @@ import {
   joinGroupModel,
 } from "../models/groupModel";
 
+
+interface CustomRequest extends Request {
+  user: any;
+}
+
 export const createGroup = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { group_name, description, user_id } = req.body;
+  const custReq = req as CustomRequest
+  const { group_name, description } = req.body;
+  const { user_id } = custReq.user
 
   try {
     const group = await createGroupModel(group_name, description, user_id);
@@ -28,7 +35,8 @@ export const joinGroup = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { user_id } = req.body;
+  const custReq = req as CustomRequest
+  const { user_id } = custReq.user;
   const { group_id } = req.params;
 
   try {

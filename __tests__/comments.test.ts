@@ -42,19 +42,17 @@ describe("create comment", () => {
       .post("/post/1/comment")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        user_id: 1,
         comment_content: "test comment content",
       });
 
     const comment = res.body.comment;
     expect(res.statusCode).toBe(201);
-    expect(comment.user.username).toBe("test");
+    expect(comment.user).toBe("tester");
     expect(comment.comment_content).toBe("test comment content");
   });
 
   it("POST 401: Should return an error if user is not signed in", async () => {
     const res = await supertest(app).post("/post/1/comment").send({
-      user_id: 1,
       content: "test comment content",
     });
 
@@ -67,7 +65,6 @@ describe("create comment", () => {
       .post("/post/1/comment")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        user_id: 1,
         comment_content: "",
       });
 
@@ -79,33 +76,16 @@ describe("create comment", () => {
     const res = await supertest(app)
       .post("/post/1/comment")
       .set("Authorization", `Bearer ${token}`)
-      .send({
-        user_id: 1,
-      });
 
     expect(res.statusCode).toBe(400);
     expect(res.body.msg).toBe("Comment content can not be empty")
   });
 
-  it("POST 400: Should return an error if thread ID is not found", async () => {
+  it("POST 400: Should return an error if post ID is not found", async () => {
     const res = await supertest(app)
       .post("/post/45/comment")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        user_id: 1,
-        comment_content: "test comment content",
-      });
-
-    expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("ID not found");
-  });
-
-  it("POST 400: Should return an error if user ID is not found", async () => {
-    const res = await supertest(app)
-      .post("/post/1/comment")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        user_id: 45,
         comment_content: "test comment content",
       });
 
@@ -118,7 +98,6 @@ describe("create comment", () => {
       .post("/post/1/comment")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        user_id: 1,
         comment_content: "test",
       });
 
@@ -134,13 +113,12 @@ describe("replies", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         post_id: 1,
-        user_id: 1,
         comment_content: "test reply content",
       });
 
     expect(res.statusCode).toBe(201);
     const reply = res.body.reply;
-    expect(reply.user.username).toBe("test");
+    expect(reply.user).toBe("tester");
     expect(reply.comment_content).toBe("test reply content");
     expect(reply.comment.comment_id).toBe(1);
   });
@@ -148,7 +126,6 @@ describe("replies", () => {
   it("POST 401: Should return an error when user is not signed in", async () => {
     const res = await supertest(app).post("/comment/1/reply").send({
       post_id: 1,
-      user_id: 1,
       comment_content: "test comment content",
     });
 
@@ -161,7 +138,6 @@ describe("replies", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         post_id: 1,
-        user_id: 1,
         comment_content: "",
       });
 
@@ -175,7 +151,6 @@ describe("replies", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         post_id: 1,
-        user_id: 1,
         comment_content: "test",
       });
 
@@ -189,7 +164,6 @@ describe("replies", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         post_id: 1,
-        user_id: 1,
         comment_content: "test reply content",
       });
 
@@ -203,21 +177,6 @@ describe("replies", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         post_id: 312,
-        user_id: 1,
-        comment_content: "test reply content",
-      });
-
-    expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("ID not found");
-  });
-
-  it("POST 400: Should return an error when user ID can not be found", async () => {
-    const res = await supertest(app)
-      .post("/comment/1/reply")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        post_id: 1,
-        user_id: 2000,
         comment_content: "test reply content",
       });
 

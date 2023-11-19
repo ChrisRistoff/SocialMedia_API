@@ -5,6 +5,16 @@ export const createGroupModel = async (
   description: string,
   user_id: number,
 ) => {
+  const user = await db.query(
+    `
+    SELECT * FROM users WHERE user_id = $1;
+  `,
+    [user_id],
+  );
+
+  if (user.rows.length < 1)
+    return Promise.reject({ errCode: 404, errMsg: "User does not exist" });
+
   const group = await db.query(
     `
     INSERT INTO groups (group_name, description, user_id)
@@ -25,6 +35,16 @@ export const createGroupModel = async (
 };
 
 export const joinGroupModel = async (group_id: number, user_id: number) => {
+  const user = await db.query(
+    `
+    SELECT * FROM users WHERE user_id = $1;
+  `,
+    [user_id],
+  );
+
+  if (user.rows.length < 1)
+    return Promise.reject({ errCode: 404, errMsg: "User does not exist" });
+
   const group = await db.query(
     `
     INSERT INTO group_members (user_id, group_id)
@@ -48,26 +68,36 @@ export const getMembersOfGroupModel = async (group_id: number) => {
   );
 
   if (members.rows.length < 1)
-    return Promise.reject({ errCode: 404, errMsg: `Group with ID ${group_id} not found` });
+    return Promise.reject({
+      errCode: 404,
+      errMsg: `Group with ID ${group_id} not found`,
+    });
 
   return members.rows;
 };
 
 export const getGroupsOfUserModel = async (user_id: number) => {
-  const user = await db.query(`
-  SELECT * FROM users WHERE user_id = $1
-  `, [user_id])
+  const user = await db.query(
+    `
+    SELECT * FROM users WHERE user_id = $1;
+  `,
+    [user_id],
+  );
 
-  if (user.rows.length < 1) return Promise.reject({errCode: 404, errMsg: `User with ID ${user_id} not found`})
+  if (user.rows.length < 1)
+    return Promise.reject({ errCode: 404, errMsg: "User does not exist" });
 
-  const groups = await db.query(`
+
+  const groups = await db.query(
+    `
     SELECT g.group_name, g.description, g.group_id
     FROM groups g
     JOIN group_members gm
     ON gm.user_id = $1
     WHERE gm.group_id = g.group_id;
-  `, [user_id])
+  `,
+    [user_id],
+  );
 
-
-  return groups.rows
-}
+  return groups.rows;
+};

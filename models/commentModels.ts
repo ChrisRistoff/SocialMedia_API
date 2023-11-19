@@ -4,15 +4,17 @@ export const createCommentModel = async (
   thread_id: number,
   user_id: number,
   comment_content: string,
+  username: string,
 ) => {
-
   const user = await db.query(
     `
-      SELECT username, created_at FROM users
-      WHERE user_id = $1
-    `,
+    SELECT * FROM users WHERE user_id = $1;
+  `,
     [user_id],
   );
+
+  if (user.rows.length < 1)
+    return Promise.reject({ errCode: 404, errMsg: "User does not exist" });
 
   const result = await db.query(
     `
@@ -21,7 +23,7 @@ export const createCommentModel = async (
     `,
     [thread_id, user_id, comment_content],
   );
-  result.rows[0].user = user.rows[0];
+  result.rows[0].user = username;
 
   return result.rows[0];
 };
@@ -31,7 +33,18 @@ export const replyToCommentModel = async (
   user_id: number,
   thread_id: number,
   reply_to_comment_id: number,
+  username: string,
 ) => {
+  const user = await db.query(
+    `
+    SELECT * FROM users WHERE user_id = $1;
+    `,
+    [user_id],
+  );
+
+  if (user.rows.length < 1)
+    return Promise.reject({ errCode: 404, errMsg: "User does not exist" });
+
   const result = await db.query(
     `
     INSERT INTO comments (comment_content, user_id, post_id, reply_to_comment_id)
@@ -46,15 +59,8 @@ export const replyToCommentModel = async (
     [reply_to_comment_id],
   );
 
-  const user = await db.query(
-    `
-    SELECT username, created_at FROM users WHERE user_id = $1;
-    `,
-    [user_id],
-  );
-
   result.rows[0].comment = comment.rows[0];
-  result.rows[0].user = user.rows[0];
+  result.rows[0].user = username;
 
   return result.rows[0];
 };

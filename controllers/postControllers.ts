@@ -5,13 +5,19 @@ import {
   getAllPostsOfUserModel,
 } from "../models/postModels";
 
+interface CustomRequest extends Request {
+  user: any;
+}
+
 export const createPostInGroup = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { user_id, title, content } = req.body;
+  const custReq = req as CustomRequest;
+  const { title, content } = req.body;
   const { group_id } = req.params;
+  const { user_id, username } = custReq.user;
 
   try {
     const post = await createPostInGroupModel(
@@ -19,6 +25,7 @@ export const createPostInGroup = async (
       +group_id,
       title,
       content,
+      username
     );
 
     if (!post) throw new Error("Internal server error");

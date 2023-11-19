@@ -35,21 +35,19 @@ describe("create post in a group", () => {
       .post("/group/1/post")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        user_id: 1,
         title: "test title",
         content: "test content",
       });
 
     expect(res.statusCode).toBe(201);
     expect(typeof res.body).toBe("object");
-    expect(res.body.post.user.username).toBe("test");
+    expect(res.body.post.user).toBe("tester");
     expect(res.body.post.title).toBe("test title");
     expect(res.body.post.content).toBe("test content");
   });
 
   it("POST 401: Should return an error if the user is not signed in", async () => {
     const res = await supertest(app).post("/group/1/post").send({
-      user_id: 1,
       title: "test title",
       content: "test content",
     });
@@ -63,21 +61,6 @@ describe("create post in a group", () => {
       .post("/group/24/post")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        user_id: 1,
-        title: "test title",
-        content: "test content",
-      });
-
-    expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("ID not found");
-  });
-
-  it("POST 400: Should return an error when user ID is not found", async () => {
-    const res = await supertest(app)
-      .post("/group/1/post")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        user_id: 300,
         title: "test title",
         content: "test content",
       });
@@ -125,6 +108,6 @@ describe('get all posts of user', () => {
     const res = await supertest(app).get("/posts/2200")
 
     expect(res.statusCode).toBe(404)
-    expect(res.body.msg).toBe("User with ID 2200 not found")
+    expect(res.body.msg).toBe("User does not exist")
   })
 })

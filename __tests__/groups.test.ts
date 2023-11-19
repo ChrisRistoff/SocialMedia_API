@@ -132,19 +132,6 @@ describe("create group", () => {
     );
   });
 
-  it("POST 400: Should return an error when user ID is not found", async () => {
-    const res = await supertest(app)
-      .post("/groups")
-      .set("Authorization", `Bearer ${token}`)
-      .send({
-        group_name: "test group name",
-        description: "test group description",
-        user_id: 142,
-      });
-
-    expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("ID not found");
-  });
 });
 
 describe("join a group as a member", () => {
@@ -171,16 +158,6 @@ describe("join a group as a member", () => {
 
     expect(res.statusCode).toBe(409);
     expect(res.body.msg).toBe("You are already a member of the group");
-  });
-
-  it("POST 400: Should return an error when user ID can not be found", async () => {
-    const res = await supertest(app)
-      .post("/join_group/1")
-      .set("Authorization", `Bearer ${token}`)
-      .send({ user_id: 100 });
-
-    expect(res.statusCode).toBe(400);
-    expect(res.body.msg).toBe("ID not found");
   });
 
   it("POST 400: Should return an error when group ID can not be found", async () => {
@@ -221,12 +198,4 @@ describe('get all groups of a user', () => {
     expect(Array.isArray(res.body.groups)).toBe(true)
     expect(res.body.groups.length > 0).toBe(true)
   })
-
-  it("POST 400: Should return an error when user ID is not found", async () => {
-    const res = await supertest(app).get("/user/123/groups");
-
-    expect(res.statusCode).toBe(404);
-    expect(res.body.msg).toBe("User with ID 123 not found");
-  });
-
 })

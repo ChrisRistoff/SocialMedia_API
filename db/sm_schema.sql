@@ -11,6 +11,14 @@ CREATE TABLE IF NOT EXISTS users(
     password TEXT
 );
 
+CREATE TABLE IF NOT EXISTS friends(
+    user_id1 INTEGER REFERENCES users(user_id),
+    user_id2 INTEGER REFERENCES users(user_id),
+    status TEXT NOT NULL,
+    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP(3)
+);
+
 CREATE TABLE IF NOT EXISTS groups(
     group_id SERIAL PRIMARY KEY,
     group_name TEXT,
