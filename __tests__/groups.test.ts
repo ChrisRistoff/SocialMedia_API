@@ -209,6 +209,24 @@ describe("get all members of a group", () => {
     const res = await supertest(app).get("/group/123/members");
 
     expect(res.statusCode).toBe(404);
-    expect(res.body.msg).toBe("Group not found");
+    expect(res.body.msg).toBe("Group with ID 123 not found");
   });
 });
+
+describe('get all groups of a user', () => {
+  it('POST 200: Should return an array of all groups a user has joined', async () => {
+    const res = await supertest(app).get("/user/1/groups")
+
+    expect(res.statusCode).toBe(200)
+    expect(Array.isArray(res.body.groups)).toBe(true)
+    expect(res.body.groups.length > 0).toBe(true)
+  })
+
+  it("POST 400: Should return an error when user ID is not found", async () => {
+    const res = await supertest(app).get("/user/123/groups");
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body.msg).toBe("User with ID 123 not found");
+  });
+
+})

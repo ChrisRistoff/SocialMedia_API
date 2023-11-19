@@ -48,7 +48,26 @@ export const getMembersOfGroupModel = async (group_id: number) => {
   );
 
   if (members.rows.length < 1)
-    return Promise.reject({ errCode: 404, errMsg: "Group not found" });
+    return Promise.reject({ errCode: 404, errMsg: `Group with ID ${group_id} not found` });
 
   return members.rows;
 };
+
+export const getGroupsOfUserModel = async (user_id: number) => {
+  const user = await db.query(`
+  SELECT * FROM users WHERE user_id = $1
+  `, [user_id])
+
+  if (user.rows.length < 1) return Promise.reject({errCode: 404, errMsg: `User with ID ${user_id} not found`})
+
+  const groups = await db.query(`
+    SELECT g.group_name, g.description, g.group_id
+    FROM groups g
+    JOIN group_members gm
+    ON gm.user_id = $1
+    WHERE gm.group_id = g.group_id;
+  `, [user_id])
+
+
+  return groups.rows
+}

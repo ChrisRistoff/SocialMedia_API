@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import {
   createGroupModel,
+  getGroupsOfUserModel,
   getMembersOfGroupModel,
   joinGroupModel,
 } from "../models/groupModel";
@@ -56,3 +57,16 @@ export const getMembersOfGroup = async (
     next(err);
   }
 };
+
+export const getGroupsOfUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.params
+
+  try {
+    const groups = await getGroupsOfUserModel(+user_id)
+
+    res.status(200).send({ groups })
+  } catch (err) {
+    console.log(err)
+    next(err)
+  }
+}

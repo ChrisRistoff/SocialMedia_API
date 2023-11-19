@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { protect } from "../middleware/authMiddleware";
-import { createGroup, getMembersOfGroup, joinGroup } from "../controllers/groupController";
+import { createGroup, getGroupsOfUser, getMembersOfGroup, joinGroup } from "../controllers/groupController";
 import { body } from "express-validator";
 import { handleInputError } from "../middleware/validationError";
 
@@ -23,3 +23,4 @@ protectedGroupRouter.post(
 protectedGroupRouter.post("/join_group/:group_id", protect, joinGroup);
 
 groupRouter.get("/group/:group_id/members", getMembersOfGroup)
+groupRouter.get("/user/:user_id/groups", getGroupsOfUser)
