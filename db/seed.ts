@@ -1,91 +1,128 @@
 import * as db from "./index";
-import * as post from "./seed_data/post";
-import { user } from "./seed_data/user";
-import { comment } from "./seed_data/comment";
-import { reply } from "./seed_data/reply";
+import { posts } from "./seed_data/posts";
+import { users } from "./seed_data/users";
+import { comments } from "./seed_data/comments";
+import { replies } from "./seed_data/replies";
 import { hashPassword } from "../middleware/authMiddleware";
+import { groups } from "./seed_data/groups";
 
-console.log(process.env.DB_NAME)
+console.log(process.env.DB_NAME);
 
-export const seed = async (post: any, user: any, comment: any, reply: any) => {
+export const seed = async (
+  groups: any,
+  posts: any,
+  users: any,
+  comments: any,
+  replies: any,
+) => {
   try {
-    const ctgs = await createGroups();
-    console.log(ctgs.rows);
-    const usr = await createUser(user);
-    console.log(usr.rows);
-    const thrd = await createPost(post.post);
-    const thrd2 = await createPost(post.post2);
-    console.log(thrd.rows);
-    console.log(thrd2.rows);
-    const pst = await createComment(comment);
-    console.log(pst.rows);
-    const rpl = await createReply(reply);
-    console.log(rpl.rows);
-    if(process.env.NODE_ENV !== "test")
-    db.pool.end()
+    const grps = await createGroups(groups);
+    console.log(grps);
+    const usr = await createUsers(users);
+    console.log(usr);
+    const psts = await createPosts(posts);
+    console.log(psts);
+    const cmts = await createComments(comments);
+    console.log(cmts);
+    const rpls = await createReplies(replies);
+    console.log(rpls);
+    if (process.env.NODE_ENV !== "test") db.pool.end();
   } catch (err) {
     console.log(err);
   }
 };
 
-const createUser = async (user: any) => {
-  user.password = await hashPassword(user.password);
-  console.log(user.password);
-  return await db.query(
-    `
-    INSERT INTO users(username, email, password)
-    VALUES ($1, $2, $3) RETURNING *
-  `,
-    [user.username, user.email, user.password],
-  );
+const createUsers = async (users: any) => {
+  const result = []
+
+  for (const user of users) {
+    user.password = await hashPassword(user.password);
+    const newUser = await db.query(
+      `
+      INSERT INTO users(username, email, password)
+      VALUES ($1, $2, $3) RETURNING *
+      `,
+      [user.username, user.email, user.password],
+    );
+    result.push(newUser.rows[0])
+  }
+
+  return result
 };
 
-const createGroups = async () => {
-  return await db.query(
-    `
-    INSERT INTO groups(group_name, description) VALUES
-    ( 'JavaScript BE', 'Everything JS backend' ),
-    ( 'DATABASES', 'Everything DATABASES' ) RETURNING *;
-  `,
-    [],
-  );
+const createGroups = async (groups: any) => {
+  const result = [];
+
+  for (const group of groups) {
+    const newGroup = await db.query(
+      `
+      INSERT INTO groups(group_name, description) VALUES
+      ($1, $2) RETURNING *;
+      `,
+      [group.group_name, group.description],
+    );
+
+    result.push(newGroup.rows[0]);
+  }
+
+  return result;
 };
 
-const createPost = async (post: any) => {
-  return await db.query(
-    `
-    INSERT INTO posts(title, content, group_id, user_id)
-    VALUES ($1, $2, $3, $4) RETURNING *
-  `,
-    [post.title, post.content, post.group_id, post.user_id],
-  );
+const createPosts = async (posts: any) => {
+  const result = [];
+  for (let post of posts) {
+    const newPost = await db.query(
+      `
+      INSERT INTO posts(title, content, group_id, user_id)
+      VALUES ($1, $2, $3, $4) RETURNING *
+      `,
+      [post.title, post.content, post.group_id, post.user_id],
+    );
+
+    result.push(newPost.rows[0]);
+  }
+
+  return result;
 };
 
-const createComment = async (comment: any) => {
-  return await db.query(
-    `
-    INSERT INTO comments(comment_content, user_id, post_id)
-    VALUES ($1, $2, $3) RETURNING *
-  `,
-    [comment.comment_content, comment.user_id, comment.post_id],
-  );
+const createComments = async (comments: any) => {
+  const result = []
+
+  for (const comment of comments) {
+    const newComment = await db.query(
+      `
+      INSERT INTO comments(comment_content, user_id, post_id)
+      VALUES ($1, $2, $3) RETURNING *
+      `,
+      [comment.comment_content, comment.user_id, comment.post_id],
+    );
+    result.push(newComment.rows[0])
+  }
+
+  return result
 };
 
-const createReply = async (reply: any) => {
-  return await db.query(
-    `
-    INSERT INTO comments(comment_content, user_id, post_id, reply_to_comment_id)
-    VALUES ($1, $2, $3, $4) RETURNING *
-  `,
-    [
-      reply.comment_content,
-      reply.user_id,
-      reply.post_id,
-      reply.reply_to_comment_id,
-    ],
-  );
+const createReplies = async (replies: any) => {
+  const result = []
+
+  for (const reply of replies) {
+    const newReply = await db.query(
+      `
+      INSERT INTO comments(comment_content, user_id, post_id, reply_to_comment_id)
+      VALUES ($1, $2, $3, $4) RETURNING *
+      `,
+      [
+        reply.comment_content,
+        reply.user_id,
+        reply.post_id,
+        reply.reply_to_comment_id,
+      ],
+    );
+    result.push(newReply.rows[0])
+  }
+  return result
 };
 
-seed(post, user, comment, reply).then(() => {
+seed(groups, posts, users, comments, replies).then(() => {
   console.log("Seeding done!");
 });

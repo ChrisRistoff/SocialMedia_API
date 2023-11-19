@@ -27,3 +27,7 @@ export const joinGroup = async (req: Request, res: Response, next: NextFunction)
     next(err)
   }
 }
+
+export const getMembersOfGroup = async (req: Request, res: Response, next: NextFunction) => {
+  const { group_id } = req.params
+}

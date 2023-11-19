@@ -17,3 +17,12 @@ export const joinGroupModel = async (group_id: number, user_id: number) => {
 
   return "You have successfully joined the group"
 }
+
+export const getMembersOfGroupModel = async (group_id: number) => {
+  const members = await db.query(`
+    SELECT u.user_id, u.username FROM group_members gm
+    JOIN users u
+    ON u.user_id = gm.user_id
+    WHERE gm.group_id = $1
+  `, [group_id])
+}
