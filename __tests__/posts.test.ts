@@ -32,10 +32,9 @@ afterAll(async () => {
 describe("create post in a group", () => {
   it("POST 201: Should create a new post", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/group/1/post")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        group_id: 1,
         user_id: 1,
         title: "test title",
         content: "test content",
@@ -49,8 +48,7 @@ describe("create post in a group", () => {
   });
 
   it("POST 401: Should return an error if the user is not signed in", async () => {
-    const res = await supertest(app).post("/posts").send({
-      group_id: 1,
+    const res = await supertest(app).post("/group/1/post").send({
       user_id: 1,
       title: "test title",
       content: "test content",
@@ -62,10 +60,9 @@ describe("create post in a group", () => {
 
   it("POST 400: Should return an error when group ID is not found", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/group/24/post")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        group_id: 24,
         user_id: 1,
         title: "test title",
         content: "test content",
@@ -77,10 +74,9 @@ describe("create post in a group", () => {
 
   it("POST 400: Should return an error when user ID is not found", async () => {
     const res = await supertest(app)
-      .post("/posts")
+      .post("/group/1/post")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        group_id: 1,
         user_id: 300,
         title: "test title",
         content: "test content",
@@ -93,9 +89,7 @@ describe("create post in a group", () => {
 
 describe("get all posts in a group", () => {
   it("GET 200: Should return all posts", async () => {
-    const res = await supertest(app).get("/posts").send({
-      group_id: 1,
-    });
+    const res = await supertest(app).get("/group/1/posts")
 
     const post = res.body.posts[0];
 
@@ -109,20 +103,12 @@ describe("get all posts in a group", () => {
   });
 
   it('GET 400: Should return an error when group ID is not found', async () => {
-    const res = await supertest(app).get("/posts").send({
-      group_id: 500
-    })
+    const res = await supertest(app).get("/group/500/posts")
 
     expect(res.statusCode).toBe(400)
     expect(res.body.msg).toBe("ID not found")
   })
 
-  it('GET 400: Should return an error when group ID is not given', async () => {
-    const res = await supertest(app).get("/posts").send({})
-
-    expect(res.statusCode).toBe(400)
-    expect(res.body.msg).toBe("ID not found")
-  })
 });
 
 describe('get all posts of user', () => {

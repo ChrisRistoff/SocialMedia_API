@@ -69,29 +69,59 @@ export const getAllCommentsModel = async (post_id) => {
 
   const comments = await db.query(
     `
-      SELECT
-        c.comment_id,
-        c.comment_content,
-        c.created_at AS comment_created_at,
-        c.reply_to_comment_id,
-        u.user_id,
-        u.username,
-        u.email,
-        rc.comment_content AS reply_to_content,
-        rc.created_at AS reply_to_created_at
-      FROM
-        comments c
-      JOIN
-        users u ON c.user_id = u.user_id
-      LEFT JOIN
-        comments rc ON c.reply_to_comment_id = rc.comment_id
-      WHERE
-        c.post_id = $1
-      ORDER BY
-        c.created_at;
+    SELECT
+      c.comment_id,
+      c.comment_content,
+      c.created_at AS comment_created_at,
+      u.user_id,
+      u.username
+    FROM
+      comments c
+    JOIN
+      users u ON c.user_id = u.user_id
+    WHERE
+      c.post_id = $1 AND
+      c.reply_to_comment_id IS NULL
+    ORDER BY
+      c.created_at;
+    `,
+    [post_id],
+  )
+
+  const commentsIndId = new Map()
+
+  for (let i = 0; i < comments.rows.length; i++) {
+    commentsIndId.set(comments.rows[i].comment_id, i)
+    comments.rows[i].replies = []
+  }
+
+  const replies = await db.query(
+    `
+    SELECT
+      r.comment_id,
+      r.comment_content,
+      r.created_at AS reply_created_at,
+      r.reply_to_comment_id,
+      u.user_id,
+      u.username
+    FROM
+      comments r
+    JOIN
+      users u ON r.user_id = u.user_id
+    WHERE
+      r.post_id = $1 AND
+      r.reply_to_comment_id IS NOT NULL
+    ORDER BY
+      r.created_at;
     `,
     [post_id],
   );
+
+  for (let i = 0; i < replies.rows.length; i++) {
+    if(commentsIndId.get(replies.rows[i].reply_to_comment_id) !== undefined) {
+      comments.rows[commentsIndId.get(replies.rows[i].reply_to_comment_id)].replies.push(replies.rows[i])
+    }
+  }
 
   return comments.rows;
 };

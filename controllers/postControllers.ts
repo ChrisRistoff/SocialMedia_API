@@ -10,12 +10,13 @@ export const createPostInGroup = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { user_id, group_id, title, content } = req.body;
+  const { user_id, title, content } = req.body;
+  const { group_id } = req.params;
 
   try {
     const post = await createPostInGroupModel(
       user_id,
-      group_id,
+      +group_id,
       title,
       content,
     );
@@ -34,10 +35,10 @@ export const getAllPostsInGroup = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { group_id } = req.body;
+  const { group_id } = req.params;
 
   try {
-    const posts = await getAllPostsInGroupModel(group_id);
+    const posts = await getAllPostsInGroupModel(+group_id);
 
     res.status(200).send({ posts });
   } catch (error) {
@@ -58,7 +59,7 @@ export const getAllPostsOfUser = async (
 
     res.status(200).send({ posts });
   } catch (err) {
-    console.log(err)
-    next(err)
+    console.log(err);
+    next(err);
   }
 };

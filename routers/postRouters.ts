@@ -7,7 +7,7 @@ export const protectedPostsRouter= Router();
 export const postsRouter = Router();
 
 protectedPostsRouter.post(
-  "/posts",
+  "/group/:group_id/post",
   body("title")
     .notEmpty().withMessage("")
     .isLength({ min: 10 })
@@ -20,6 +20,6 @@ protectedPostsRouter.post(
   createPostInGroup,
 );
 
-postsRouter.get("/posts", getAllPostsInGroup);
+postsRouter.get("/group/:group_id/posts", getAllPostsInGroup);
 
 postsRouter.get("/posts/:user_id", getAllPostsOfUser)

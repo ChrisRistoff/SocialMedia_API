@@ -5,14 +5,14 @@ import {
   getAllComments,
   replyToComment,
 } from "../controllers/commentController";
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 import { handleInputError } from "../middleware/validationError";
 
 export const commentsRouter = Router();
 export const protectedCommentsRouter = Router();
 
 protectedCommentsRouter.post(
-  "/comments",
+  "/post/:post_id/comment",
   protect,
   body("comment_content")
     .notEmpty()
@@ -24,7 +24,7 @@ protectedCommentsRouter.post(
 );
 
 protectedCommentsRouter.post(
-  "/replies",
+  "/comment/:reply_to_comment_id/reply",
   protect,
   body("comment_content")
     .notEmpty()
@@ -36,7 +36,7 @@ protectedCommentsRouter.post(
 );
 
 commentsRouter.get(
-  "/comments",
+  "/post/:post_id/comments",
   body("post_id").notEmpty().withMessage("Post ID required"),
   getAllComments,
 );
